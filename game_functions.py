@@ -1,11 +1,7 @@
 from game_objects import *
 
-game_state = "overworld"
+config.game_state = "overworld"
 current_game = None
-current_room = None
-
-camera_x = 0
-camera_y = 0
 
 
 def update_camera():
@@ -14,8 +10,8 @@ def update_camera():
 
     x = max(0, x)
     y = max(0, y)
-    x = min((lvl_width-WIDTH), x)
-    y = min((lvl_height-HEIGHT), y)
+    x = min((config.current_room.width-WIDTH), x)
+    y = min((config.current_room.height-HEIGHT), y)
 
     return x, y
 
@@ -25,6 +21,9 @@ class Game:
         self.offset_x = 0
         self.size_x = WIDTH
         self.size_y = HEIGHT
+
+        self.camera_x = 0
+        self.camera_y = 0
 
         self.playable = player
 
@@ -65,25 +64,19 @@ class Game:
             if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
                 for dialog in dialog_list:  # TODO completely fix THAT SHIT
                     dialog.reset()
-                global game_state
-                game_state = "overworld"  # TODO fix that shit
+                config.game_state = "overworld"  # TODO fix that shit
 
     def render(self):
-
         # render all sprites
-        camera_screen.blit(background, (0, 0))
+        config.current_room.camera_screen.blit(config.current_room.background, (0, 0))
 
-        all_sprites.draw(camera_screen)
-        fake_screen.blit(camera_screen, (0, 0), (camera_x, camera_y, WIDTH, HEIGHT))
+        config.current_room.all_sprites.draw(config.current_room.camera_screen)
+        fake_screen.blit(config.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
 
         dialog_list.draw(fake_screen)
 
         # render fake screen
-        screen.blit(pygame.transform.scale(fake_screen, (self.size_x, self.size_y)),
-                    (self.offset_x, 0)
-
-                    )
-
+        screen.blit(pygame.transform.scale(fake_screen, (self.size_x, self.size_y)), (self.offset_x, 0))
         pygame.display.update()
 
     def main_loop(self):
@@ -95,36 +88,38 @@ class Game:
 
                 self.resize(event)
 
-                if game_state == "dialog":
+                if config.game_state == "dialog":
                     self.dialog_control(event)
 
-                if game_state == "overworld":
+                if config.game_state == "overworld":
                     self.player_control(event)
 
                     for trigger in triggers_list:
                         trigger.check(event)
 
-            obstacle_list.update()
-            if game_state == "overworld":
-                character_list.update()
+            config.current_room.obstacle_list.update()
+            if config.game_state == "overworld":
+                config.current_room.character_list.update()
 
-            if game_state != "overworld":
+            if config.game_state != "overworld":
                 self.playable.stop()
 
-            if game_state == "dialog":
+            if config.game_state == "dialog":
                 dialog_list.update()
 
-            global camera_x, camera_y
-            camera_x, camera_y = update_camera()
+            self.camera_x, self.camera_y = update_camera()
             self.render()
 
             time.tick(FPS)
 
 
 class Trigger:
-    def __init__(self):
+    def __init__(self, result, once=False):
         self.count = 0
         self.triggered = False
+        self.once = once
+
+        self.result = result
 
         triggers_list.append(self)
 
@@ -132,14 +127,16 @@ class Trigger:
         pass
 
     def action(self):
-        pass
+        self.result.activate()
+
+        if self.once:
+            triggers_list.remove(self)
 
 
 class InteractTrigger(Trigger):
-    def __init__(self, target, result):
-        super().__init__()
+    def __init__(self, result, target):
+        super().__init__(result)
         self.target = target
-        self.result = result
 
     def check(self, event):
         if not self.triggered:
@@ -148,39 +145,7 @@ class InteractTrigger(Trigger):
                     if current_game.playable.vicinity_rect.colliderect(self.target):
                         self.action()
 
-    def action(self):
-        global game_state
-        activate_dialog(self.result)
-
-
-class StepOnTrigger(Trigger):  # TODO TODO
-    def __init__(self, target, result):
-        super().__init__()
-        self.target = target
-        self.result = result
-
-    def check(self, event):
-        if not self.triggered:
-            if current_game.playable.footprint_rect.colliderect(self.target):
-                self.action()
-
-    def action(self):
-        global game_state
-        activate_dialog(self.result)
-
-
-def activate_dialog(dialog):
-    pygame.mixer.music.pause()
-    dialog_list.add(dialog)
-    global game_state
-    game_state = "dialog"
-
 
 def set_current_game(game):
     global current_game
     current_game = game
-
-
-def set_current_room(room):
-    global current_room
-    current_room = room

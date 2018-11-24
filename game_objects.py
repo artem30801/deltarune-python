@@ -1,11 +1,52 @@
 from game_init import *
+import config
 
-all_sprites = pygame.sprite.LayeredUpdates()
-character_list = pygame.sprite.Group()
-obstacle_list = pygame.sprite.Group()
+
 dialog_list = pygame.sprite.Group()
 
 triggers_list = []
+
+
+class Room:
+    def __init__(self, width, height, music_name=None):
+        self.width = width
+        self.height = height
+        self.music = music_name
+
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.obstacle_list = pygame.sprite.Group()
+        self.character_list = pygame.sprite.Group()
+        # TODO list of dialogs
+
+        self.camera_screen = pygame.Surface((self.width, self.height))
+        self.background = pygame.Surface((self.width, self.height))
+        self.background.fill((100, 100, 100))  # TODO background generator
+
+    def bind(self, *game_objects):
+        for obj in game_objects:
+            self.all_sprites.add(obj)
+            if isinstance(obj, Obstacle):
+                self.obstacle_list.add(obj)
+            if isinstance(obj, Chara):
+                self.character_list.add(obj)
+
+    def activate(self):
+        config.current_room = self
+
+        pygame.mixer.music.stop()
+        if self.music is not None:
+            pygame.mixer.music.load(os.path.join('music', self.music + '.mp3'))
+            pygame.mixer.music.play()
+
+
+class RoomPortal:
+    def __init__(self, room1, room2):
+        self.room1 = room1
+        self.room2 = room2
+
+    def activate(self):
+        if config.current_room == self.room1:
+            self.room2.activate()
 
 
 class GameObj(pygame.sprite.Sprite):
@@ -41,7 +82,7 @@ class GameObj(pygame.sprite.Sprite):
 
         self._layer = self.rect.bottom
 
-        all_sprites.add(self)
+        #current_room.all_sprites.add(self)
 
     def control_speed(self, x, y):
         self.movex += x
@@ -64,7 +105,7 @@ class GameObj(pygame.sprite.Sprite):
 
         self.footprint_rect.x = self.rect.x + self.boundary[0]
         self.footprint_rect.y = self.rect.y + self.boundary[1]
-        all_sprites.change_layer(self, self.rect.bottom)
+        config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
 class Chara(GameObj):
@@ -74,7 +115,7 @@ class Chara(GameObj):
         self.vicinity_rect = self.rect.inflate(10, 10)
         self.vicinity_rect.center = self.rect.center
 
-        character_list.add(self)
+        #character_list.add(self)
 
     def update(self):
         self.rect.x += self.movex
@@ -110,7 +151,7 @@ class Chara(GameObj):
             frame_offset = 8
             self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
 
-        for obstacle in obstacle_list:
+        for obstacle in config.current_room.obstacle_list:
             # collide = pygame.sprite.collide_mask(self, obstacle)
             if self.footprint_rect.colliderect(obstacle.footprint_rect):
                 if self.movex != 0:
@@ -118,8 +159,15 @@ class Chara(GameObj):
                 if self.movey != 0:
                     self.rect.y = self.rect.y - self.movey
 
+        # collide with room border
+        if self.rect.x < 0 or self.rect.right > config.current_room.width:
+            self.rect.x = self.rect.x - self.movex
+        if self.rect.y < 0 or self.rect.bottom > config.current_room.height:
+            self.rect.y = self.rect.y - self.movey
+
         self.vicinity_rect.center = self.rect.center
-        all_sprites.change_layer(self, self.rect.bottom)
+
+        config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
 class Obstacle(GameObj):
@@ -129,9 +177,9 @@ class Obstacle(GameObj):
         self.rect.x = x
         self.rect.y = y
 
-        self.update()
+        #self.update()
 
-        obstacle_list.add(self)
+        #obstacle_list.add(self)
 
 
 class Speech(pygame.sprite.Sprite):
@@ -174,10 +222,14 @@ class Speech(pygame.sprite.Sprite):
             self.image = self.draw_all()
             if self.frame // self.speed < len(self.text):
                 if self.text[self.frame//self.speed] != " ":
-                    #pygame.mixer.music.pause()
                     self.sound.play()
-                    print("+")
+                    print(self.text[self.frame//self.speed])
         self.frame += 1
+
+    def activate(self):
+        pygame.mixer.music.pause()
+        dialog_list.add(self)
+        config.game_state = "dialog"
 
     def reset(self):
         dialog_list.remove(self)
@@ -200,11 +252,3 @@ class Dialog:
 
     def end(self):
         pass
-
-
-class Room:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-
-        self.objects = []
