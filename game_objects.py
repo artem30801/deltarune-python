@@ -94,7 +94,7 @@ class RoomPortalStep(RoomPortal):
 
 class GameObj(pygame.sprite.Sprite):
     def __init__(self, img_class, img_name, animation_cycle=1, sprite_count=1, speed=5,
-                 position=(0, 0), empty_size=(80, 80)):
+                 position=(0, 0), empty_size=(80, 85)):
         pygame.sprite.Sprite.__init__(self)
 
         self.movex = 0
@@ -140,21 +140,20 @@ class GameObj(pygame.sprite.Sprite):
         self.rect.x += self.movex
         self.rect.y += self.movey
 
-        self.frame += 1
-        if self.frame > self.animation_cycle:
+        if self.frame >= self.sprite_count*self.animation_cycle:
             self.frame = 0
-        frame_offset = -1
 
-        self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
+        self.image = self.images[(self.frame // self.animation_cycle)]
+        self.frame += 1
 
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
 class Chara(GameObj):
     def __init__(self, img_name):
-        super().__init__('characters', img_name, 4, 16)
+        super().__init__('characters', img_name, 3, 16)
 
-        self.boundary = (0, 75, 25, 5)
+        self.boundary = (0, 70, 40, 15)
 
         self.footprint_rect = pygame.rect.Rect((self.boundary[0] + self.rect.x,
                                                 self.boundary[1] + self.rect.y,
@@ -169,47 +168,42 @@ class Chara(GameObj):
         self.rect.y += self.movey
 
         self.footprint_rect.midbottom = self.rect.midbottom
+        if self.frame >= 4 * self.animation_cycle:
+            self.frame = 0
 
+        frame_offset = 0
         if self.movey > 0:
-            self.frame += 1
-            if self.frame > 3 * self.animation_cycle:
-                self.frame = 0
             frame_offset = 0
-            self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
-
         if self.movey < 0:
-            self.frame += 1
-            if self.frame > 3 * self.animation_cycle:
-                self.frame = 0
             frame_offset = 12
-            self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
-
         if self.movex > 0:
-            self.frame += 1
-            if self.frame > 3 * self.animation_cycle:
-                self.frame = 0
             frame_offset = 4
-            self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
-
         if self.movex < 0:
-            self.frame += 1
-            if self.frame > 3 * self.animation_cycle:
-                self.frame = 0
             frame_offset = 8
-            self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
 
+        if self.movex != 0 or self.movey != 0:
+            self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
+            print(self.frame, (self.frame // self.animation_cycle))
+            self.frame += 1
+
+        collide_x = False
+        collide_y = False
         for obstacle in config.current_room.obstacle_list:
             # collide = pygame.sprite.collide_mask(self, obstacle)
             if self.footprint_rect.colliderect(obstacle.footprint_rect):
                 if self.movex != 0:
-                    self.rect.x = self.rect.x - self.movex
+                    collide_x = True
                 if self.movey != 0:
-                    self.rect.y = self.rect.y - self.movey
-
+                    collide_y = True
         # collide with room border
         if self.rect.x < 0 or self.rect.right > config.current_room.width:
-            self.rect.x = self.rect.x - self.movex
+            collide_x = True
         if self.rect.y < 0 or self.rect.bottom > config.current_room.height:
+            collide_y = True
+        # undo movement if collide
+        if collide_x:
+            self.rect.x = self.rect.x - self.movex
+        if collide_y:
             self.rect.y = self.rect.y - self.movey
 
         self.vicinity_rect.center = self.rect.center
@@ -232,12 +226,12 @@ class Obstacle(GameObj):
         self.rect.x += self.movex
         self.rect.y += self.movey
 
-        self.frame += 1
-        if self.frame > self.animation_cycle:
+        if self.frame >= self.sprite_count*self.animation_cycle:
             self.frame = 0
-        frame_offset = -1
 
-        self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
+        self.image = self.images[(self.frame // self.animation_cycle)]
+        self.frame += 1
+
         self.footprint_rect.x = self.rect.x + self.boundary[0]
         self.footprint_rect.y = self.rect.y + self.boundary[1]
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)

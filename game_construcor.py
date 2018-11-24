@@ -10,7 +10,9 @@ lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
                [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],
                [ob, ob, ob, ob, ob, 21, 22, no, no, no, no, no],
                [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],
-               [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob]]
+               [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],
+               [1, 1, 1, 1, 1, 25, 25, 1, 1, 1, 1, 1],
+               [ob, ob, ob, ob, ob, ob, ob, ob, ob, ob, ob, ob]]
 
 room1 = Room(960, 960, "fofdr")
 room2 = Room(800, 600, "27. April 2012")
@@ -26,9 +28,10 @@ tree2 = Obstacle( "tree_d_r", (200, 200), boundary=(130, 320, 130, 50))
 
 nottree = Obstacle("blookhouse", (100, 0), boundary=(0, 200, 183, 58))
 
+ral_dance = GameObj("default_dance/ralsei", "frame", 2, 67, position=(0, 0))
 
 room1.bind(kris, tree1, nottree)
-room2.bind(kris, tree2)
+room2.bind(kris, tree2, ral_dance)
 
 portal12 = RoomPortalStep(room1, room2, (100, 100), (880, 560, 80, 80), "snd_phone")
 

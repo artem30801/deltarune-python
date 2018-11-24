@@ -55,7 +55,7 @@ class Game:
 
     def update_camera(self):
         self.camera_x = self.playable.rect.centerx - WIDTH // 2
-        self.camera_y = self.playable.rect.centery - WIDTH // 2
+        self.camera_y = self.playable.rect.centery - HEIGHT // 2
 
         self.camera_x = max(0, self.camera_x)
         self.camera_y = max(0, self.camera_y)
@@ -93,9 +93,10 @@ class Game:
                     for trigger in config.current_room.triggers_list:
                         trigger.check(event)
 
+            config.current_room.all_sprites.update()
             config.current_room.obstacle_list.update()
-            if config.game_state == "overworld":
-                config.current_room.character_list.update()
+            #if config.game_state == "overworld":
+                #config.current_room.character_list.update()
 
             if config.game_state != "overworld":
                 self.playable.stop()

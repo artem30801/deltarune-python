@@ -26,12 +26,15 @@ HEIGHT = 600
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 
 # Init screens
+icon = pygame.image.load(os.path.join('images', 'icon' + '.jpg'))
+icon = pygame.transform.smoothscale(icon, (32, 32))
+pygame.display.set_icon(icon)
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT), HWSURFACE | DOUBLEBUF | RESIZABLE)
 fake_screen = screen.copy()
 
 pygame.display.set_caption("SURVEY_PROGRAM")
-icon = pygame.image.load(os.path.join('images', 'icon' + '.jpg')).convert()
-pygame.display.set_icon(icon)
+
 
 # Tick-tock clock
 FPS = 30
