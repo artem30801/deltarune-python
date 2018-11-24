@@ -4,14 +4,14 @@ import config
 
 dialog_list = pygame.sprite.Group()
 
-triggers_list = []
-
 
 class Room:
     def __init__(self, width, height, music_name=None):
         self.width = width
         self.height = height
         self.music = music_name
+
+        self.triggers_list = []
 
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.obstacle_list = pygame.sprite.Group()
@@ -20,7 +20,28 @@ class Room:
 
         self.camera_screen = pygame.Surface((self.width, self.height))
         self.background = pygame.Surface((self.width, self.height))
-        self.background.fill((100, 100, 100))  # TODO background generator
+
+    def generate_floor(self, tiles, type_name, back_color=(0, 0, 0)):
+        self.background.fill(back_color)
+        images = []
+        for i in range(0, 26 + 1):
+            img = pygame.image.load(os.path.join('images', 'env', 'tiles', type_name, 'tile' + str(i).zfill(3) + '.png')).convert()
+            img = pygame.transform.scale2x(img)
+            img.convert_alpha()
+            # img.set_colorkey(ALPHA)
+            images.append(img)
+
+        for y, row in enumerate(tiles):
+            for x, tile in enumerate(row):
+                if tile == "ob":
+                    obstacle = Obstacle(None, (x * 80, y * 80), boundary=(0, 0, 80, 80))
+                    self.bind(obstacle)
+                elif tile == "no":
+                    panel = pygame.Surface((80, 80))
+                    panel.fill(back_color)
+                    self.background.blit(panel, (x * 80, y * 80))
+                else:
+                    self.background.blit(images[tile], (x * 80, y * 80))
 
     def bind(self, *game_objects):
         for obj in game_objects:
@@ -30,33 +51,55 @@ class Room:
             if isinstance(obj, Chara):
                 self.character_list.add(obj)
 
+    def bind_triggers(self, *triggers):
+        self.triggers_list.extend(triggers)
+
     def activate(self):
         config.current_room = self
 
         pygame.mixer.music.stop()
         if self.music is not None:
             pygame.mixer.music.load(os.path.join('music', self.music + '.mp3'))
-            pygame.mixer.music.play()
+            pygame.mixer.music.play(-1)
 
 
 class RoomPortal:
-    def __init__(self, room1, room2):
+    def __init__(self, room1, room2, tp_position=(0, 0), sound_name=None):
         self.room1 = room1
         self.room2 = room2
 
+        self.tp_position = tp_position
+
+        self.sound = None
+        if sound_name is not None:
+            self.sound = pygame.mixer.Sound(os.path.join('SFX', sound_name + '.wav'))
+
     def activate(self):
+        config.current_game.playable.rect.center = self.tp_position
+        if self.sound is not None:
+            self.sound.play()
         if config.current_room == self.room1:
             self.room2.activate()
 
 
+class RoomPortalStep(RoomPortal):
+    def __init__(self, room1, room2, tp_position=(0, 0), position=(0, 0, 80, 80), sound_name=None):
+        super().__init__(room1, room2, tp_position, sound_name)
+        self.position = position
+        portal = GameObj(None, None, position=(position[0], position[1]))
+        trigger = StepOnTrigger(self, portal)
+        room1.bind(portal)
+        room1.bind_triggers(trigger)
+
+
 class GameObj(pygame.sprite.Sprite):
     def __init__(self, img_class, img_name, animation_cycle=1, sprite_count=1, speed=5,
-                 boundary=(0, 0, 0, 0)):
+                 position=(0, 0), empty_size=(80, 80)):
         pygame.sprite.Sprite.__init__(self)
 
         self.movex = 0
         self.movey = 0
-        self.boundary = boundary
+        self.position = position
 
         self.speed = speed
 
@@ -66,23 +109,24 @@ class GameObj(pygame.sprite.Sprite):
 
         self.images = []
         for i in range(1, self.sprite_count + 1):
-            img = pygame.image.load(os.path.join('images', img_class, img_name + str(i) + '.png')).convert()
-            img = pygame.transform.scale2x(img)
-            img.convert_alpha()
-            img.set_colorkey(ALPHA)
+            if img_name is not None:
+                img = pygame.image.load(os.path.join('images', img_class, img_name + str(i) + '.png')).convert()
+                img.set_colorkey(ALPHA)
+                img.convert_alpha()
+                img = pygame.transform.scale2x(img)
+            else:
+                img = pygame.Surface(empty_size)
+                img.set_colorkey(ALPHA)
+
+            # img = pygame.transform.smoothscale(img, (scale*img.get_width(), scale*img.get_height()))
             self.images.append(img)
 
         self.image = self.images[0]
         self.rect = self.image.get_rect()
-
-        self.footprint_rect = pygame.rect.Rect((self.boundary[0]+self.rect.x,
-                                                self.boundary[1]+self.rect.y,
-                                                self.boundary[2], self.boundary[3]
-                                                ))
+        self.rect.x = position[0]
+        self.rect.y = position[1]
 
         self._layer = self.rect.bottom
-
-        #current_room.all_sprites.add(self)
 
     def control_speed(self, x, y):
         self.movex += x
@@ -103,19 +147,22 @@ class GameObj(pygame.sprite.Sprite):
 
         self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
 
-        self.footprint_rect.x = self.rect.x + self.boundary[0]
-        self.footprint_rect.y = self.rect.y + self.boundary[1]
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
 class Chara(GameObj):
     def __init__(self, img_name):
-        super().__init__('characters', img_name, 4, 16, boundary=(0, 75, 25, 5))
+        super().__init__('characters', img_name, 4, 16)
+
+        self.boundary = (0, 75, 25, 5)
+
+        self.footprint_rect = pygame.rect.Rect((self.boundary[0] + self.rect.x,
+                                                self.boundary[1] + self.rect.y,
+                                                self.boundary[2], self.boundary[3]
+                                                ))
 
         self.vicinity_rect = self.rect.inflate(10, 10)
         self.vicinity_rect.center = self.rect.center
-
-        #character_list.add(self)
 
     def update(self):
         self.rect.x += self.movex
@@ -171,15 +218,29 @@ class Chara(GameObj):
 
 
 class Obstacle(GameObj):
-    def __init__(self, x, y, img_name, frames=1, boundary=(0, 0, 100, 100)):
-        super().__init__('env', img_name, frames, boundary=boundary)
+    def __init__(self, img_name, position=(0, 0), boundary=(0, 0, 80, 80), frames=1,):
+        super().__init__('env', img_name, frames, position=position)
 
-        self.rect.x = x
-        self.rect.y = y
+        self.boundary = boundary
 
-        #self.update()
+        self.footprint_rect = pygame.rect.Rect((self.boundary[0] + self.rect.x,
+                                                self.boundary[1] + self.rect.y,
+                                                self.boundary[2], self.boundary[3]
+                                                ))
 
-        #obstacle_list.add(self)
+    def update(self):
+        self.rect.x += self.movex
+        self.rect.y += self.movey
+
+        self.frame += 1
+        if self.frame > self.animation_cycle:
+            self.frame = 0
+        frame_offset = -1
+
+        self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
+        self.footprint_rect.x = self.rect.x + self.boundary[0]
+        self.footprint_rect.y = self.rect.y + self.boundary[1]
+        config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
 class Speech(pygame.sprite.Sprite):
@@ -252,3 +313,44 @@ class Dialog:
 
     def end(self):
         pass
+
+
+class Trigger:
+    def __init__(self, result, once=False):
+        self.count = 0
+        self.triggered = False
+        self.once = once
+
+        self.result = result
+
+    def check(self, event):
+        pass
+
+    def action(self):
+        if self.once:
+            config.current_room.triggers_list.remove(self)
+        self.result.activate()
+
+
+class InteractTrigger(Trigger):
+    def __init__(self, result, target):
+        super().__init__(result)
+        self.target = target
+
+    def check(self, event):
+        if not self.triggered:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_RETURN or event.key == ord('z'):
+                    if config.current_game.playable.vicinity_rect.colliderect(self.target.footprint_rect):
+                        self.action()
+
+
+class StepOnTrigger(Trigger):
+    def __init__(self, result, target):
+        super().__init__(result)
+        self.target = target
+
+    def check(self, event):
+        if not self.triggered:
+            if config.current_game.playable.footprint_rect.colliderect(self.target.rect):
+                self.action()

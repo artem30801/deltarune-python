@@ -1,19 +1,6 @@
 from game_objects import *
 
 config.game_state = "overworld"
-current_game = None
-
-
-def update_camera():
-    x = current_game.playable.rect.centerx - WIDTH//2
-    y = current_game.playable.rect.centery - WIDTH//2
-
-    x = max(0, x)
-    y = max(0, y)
-    x = min((config.current_room.width-WIDTH), x)
-    y = min((config.current_room.height-HEIGHT), y)
-
-    return x, y
 
 
 class Game:
@@ -66,6 +53,15 @@ class Game:
                     dialog.reset()
                 config.game_state = "overworld"  # TODO fix that shit
 
+    def update_camera(self):
+        self.camera_x = self.playable.rect.centerx - WIDTH // 2
+        self.camera_y = self.playable.rect.centery - WIDTH // 2
+
+        self.camera_x = max(0, self.camera_x)
+        self.camera_y = max(0, self.camera_y)
+        self.camera_x = min((config.current_room.width - WIDTH), self.camera_x)
+        self.camera_y = min((config.current_room.height - HEIGHT), self.camera_y)
+
     def render(self):
         # render all sprites
         config.current_room.camera_screen.blit(config.current_room.background, (0, 0))
@@ -94,7 +90,7 @@ class Game:
                 if config.game_state == "overworld":
                     self.player_control(event)
 
-                    for trigger in triggers_list:
+                    for trigger in config.current_room.triggers_list:
                         trigger.check(event)
 
             config.current_room.obstacle_list.update()
@@ -107,45 +103,7 @@ class Game:
             if config.game_state == "dialog":
                 dialog_list.update()
 
-            self.camera_x, self.camera_y = update_camera()
+            self.update_camera()
             self.render()
 
             time.tick(FPS)
-
-
-class Trigger:
-    def __init__(self, result, once=False):
-        self.count = 0
-        self.triggered = False
-        self.once = once
-
-        self.result = result
-
-        triggers_list.append(self)
-
-    def check(self, event):
-        pass
-
-    def action(self):
-        self.result.activate()
-
-        if self.once:
-            triggers_list.remove(self)
-
-
-class InteractTrigger(Trigger):
-    def __init__(self, result, target):
-        super().__init__(result)
-        self.target = target
-
-    def check(self, event):
-        if not self.triggered:
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_RETURN or event.key == ord('z'):
-                    if current_game.playable.vicinity_rect.colliderect(self.target):
-                        self.action()
-
-
-def set_current_game(game):
-    global current_game
-    current_game = game

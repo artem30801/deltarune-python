@@ -4,21 +4,23 @@ import wave
 from pygame.locals import *
 
 # Init pygame itself
+pygame.mixer.pre_init(44100, -16, 64, 1024)
+pygame.init()
+pygame.mixer.quit()
+pygame.mixer.init(44100, -16, 64, 1024)
 pygame.init()
 
 # Init sound
-file_wav = wave.open(os.path.join('SFX', "talk_default" + '.wav'))
-frequency = file_wav.getframerate()
-pygame.mixer.init(frequency=frequency)
+#file_wav = wave.open(os.path.join('SFX', "talk_default" + '.wav'))
+#frequency = file_wav.getframerate()
+#print(frequency)
+#pygame.mixer.init(frequency=frequency)
 
 # Init basic variables
 ALPHA = (0, 0, 0)
 
 WIDTH = 800
 HEIGHT = 600
-
-lvl_width = 1200
-lvl_height = 1200
 
 # Init window
 os.environ["SDL_VIDEO_CENTERED"] = "1"
