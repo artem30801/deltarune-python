@@ -23,21 +23,23 @@ dialog2 = Speech("Thus is NOT your home", "arial", "lanc_dank", "talk_default", 
 dialog3 = Speech("Seems like another tree", "arial", "lanc_dank", "talk_default", 3)
 
 
-tree1 = Obstacle("tree_d_r", (700, 100),  boundary=(130, 320, 130, 50))
-tree2 = Obstacle( "tree_d_r", (200, 200), boundary=(130, 320, 130, 50))
+tree1 = Obstacle("tree_d_r", (550, 0), (130, 320, 130, 50))
+boombox = Obstacle("boombox", (400, 300), (0, 0, 80, 80), 10, 2)
 
-nottree = Obstacle("blookhouse", (100, 0), boundary=(0, 200, 183, 58))
+blookhouse = Obstacle("blookhouse", (100, 0), boundary=(0, 200, 183, 58))
 
-ral_dance = GameObj("default_dance/ralsei", "frame", 2, 67, position=(0, 0))
+#boombox = GameObj("env", "boombox", 1, 2, position=(0, 0))
 
-room1.bind(kris, tree1, nottree)
-room2.bind(kris, tree2, ral_dance)
+room1.bind(kris, tree1, blookhouse)
+room2.bind(kris, boombox)
 
-portal12 = RoomPortalStep(room1, room2, (100, 100), (880, 560, 80, 80), "snd_phone")
+portal12 = RoomPortalStep(room1, room2, (100, 300), (950, 560, 10, 80), "snd_phone")
+portal21 = RoomPortalStep(room2, room1, (870, 555), (0, 300, 10, 80), "snd_phone")
+
 
 trig1 = InteractTrigger(dialog1, tree1)
-trig2 = InteractTrigger(portal12, nottree)
-trig3 = InteractTrigger(dialog3, tree2)
+trig2 = InteractTrigger(dialog2, blookhouse)
+trig3 = InteractTrigger(dialog3, boombox)
 
 room1.bind_triggers(trig1, trig2)
 room2.bind_triggers(trig3)

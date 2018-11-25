@@ -1,6 +1,7 @@
 from game_objects import *
 
 config.game_state = "overworld"
+fake_screen = screen.copy()
 
 
 class Game:
@@ -11,6 +12,8 @@ class Game:
 
         self.camera_x = 0
         self.camera_y = 0
+
+        self.degree = 0
 
         self.playable = player
 
@@ -47,11 +50,20 @@ class Game:
             self.offset_x = (event.dict['size'][0] - self.size_x) // 2
 
     def dialog_control(self, event):
-        if event.type == pygame.KEYUP:
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
                 for dialog in dialog_list:  # TODO completely fix THAT SHIT
                     dialog.reset()
                 config.game_state = "overworld"  # TODO fix that shit
+
+            if event.key == pygame.K_LEFT or event.key == ord('a'):
+                pass
+            if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                pass
+            if event.key == pygame.K_UP or event.key == ord('w'):
+                pass
+            if event.key == pygame.K_DOWN or event.key == ord('s'):
+                pass
 
     def update_camera(self):
         self.camera_x = self.playable.rect.centerx - WIDTH // 2
@@ -63,20 +75,23 @@ class Game:
         self.camera_y = min((config.current_room.height - HEIGHT), self.camera_y)
 
     def render(self):
-        # render all sprites
+        #render background
         config.current_room.camera_screen.blit(config.current_room.background, (0, 0))
 
+        # render all sprites on whole room
         config.current_room.all_sprites.draw(config.current_room.camera_screen)
-        fake_screen.blit(config.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
 
+        fake_screen.blit(config.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
         dialog_list.draw(fake_screen)
 
         # render fake screen
         screen.blit(pygame.transform.scale(fake_screen, (self.size_x, self.size_y)), (self.offset_x, 0))
+
         pygame.display.update()
 
     def main_loop(self):
         while self.active:
+            pygame.event.post(pygame.event.Event(USEREVENT + 0, {}))  # fix to update triggers every frame
             events = pygame.event.get()
             for event in events:
                 if event.type == pygame.QUIT:
@@ -84,18 +99,18 @@ class Game:
 
                 self.resize(event)
 
-                if config.game_state == "dialog":
-                    self.dialog_control(event)
-
                 if config.game_state == "overworld":
                     self.player_control(event)
-
                     for trigger in config.current_room.triggers_list:
                         trigger.check(event)
 
-            config.current_room.all_sprites.update()
-            config.current_room.obstacle_list.update()
-            #if config.game_state == "overworld":
+                elif config.game_state == "dialog":
+                    self.dialog_control(event)
+
+
+            #config.current_room.obstacle_list.update()
+            if config.game_state == "overworld":
+                config.current_room.all_sprites.update()
                 #config.current_room.character_list.update()
 
             if config.game_state != "overworld":

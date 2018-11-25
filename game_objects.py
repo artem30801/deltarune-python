@@ -75,7 +75,7 @@ class RoomPortal:
             self.sound = pygame.mixer.Sound(os.path.join('SFX', sound_name + '.wav'))
 
     def activate(self):
-        config.current_game.playable.rect.center = self.tp_position
+        config.current_game.playable.rect.topleft = self.tp_position
         if self.sound is not None:
             self.sound.play()
         if config.current_room == self.room1:
@@ -183,7 +183,6 @@ class Chara(GameObj):
 
         if self.movex != 0 or self.movey != 0:
             self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
-            print(self.frame, (self.frame // self.animation_cycle))
             self.frame += 1
 
         collide_x = False
@@ -212,8 +211,8 @@ class Chara(GameObj):
 
 
 class Obstacle(GameObj):
-    def __init__(self, img_name, position=(0, 0), boundary=(0, 0, 80, 80), frames=1,):
-        super().__init__('env', img_name, frames, position=position)
+    def __init__(self, img_name, position=(0, 0), boundary=(0, 0, 80, 80), animation_cycle=1, sprite_count=1,):
+        super().__init__('env', img_name, animation_cycle, sprite_count, position=position)
 
         self.boundary = boundary
 
@@ -237,12 +236,25 @@ class Obstacle(GameObj):
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
+class Dialog:
+    def __init__(self, *speech):
+        self.speeches = speech
+        self.count = len(self.speeches)
+        self.current = 0
+
+    def next(self):
+        self.current += 1
+
+    def end(self):
+        pass
+
+
 class Speech(pygame.sprite.Sprite):
-    def __init__(self, text, font, img_name, sound_name, speed, img_size=150):
+    def __init__(self, text, font, img_name, sound_name, speed=3):
         pygame.sprite.Sprite.__init__(self)
         self.text = text
         self.font = pygame.font.SysFont(font, 72)
-        self.size = img_size
+        self.size = 150
         self.frame = 0
         self.speed = speed
 
@@ -294,19 +306,6 @@ class Speech(pygame.sprite.Sprite):
 
 class DialogChoice:  #TODO
     pass
-
-
-class Dialog:
-    def __init__(self, *speech):
-        self.speeches = speech
-        self.count = len(self.speeches)
-        self.current = 0
-
-    def next(self):
-        self.current += 1
-
-    def end(self):
-        pass
 
 
 class Trigger:
