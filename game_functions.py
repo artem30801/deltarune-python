@@ -1,7 +1,33 @@
 from game_objects import *
+from ctypes import POINTER, WINFUNCTYPE, windll
+from ctypes.wintypes import BOOL, HWND, RECT
+
+user32 = windll.user32
+screensize = user32.GetSystemMetrics(78), user32.GetSystemMetrics(79)
 
 config.game_state = "overworld"
 fake_screen = screen.copy()
+
+
+def get_winrect():
+    hwnd = pygame.display.get_wm_info()['window']
+    prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
+    paramflags = (1, "hwnd"), (2, "lprect")
+    getrect = prototype(("GetWindowRect", windll.user32), paramflags)
+    rect = getrect(hwnd)
+
+    x = rect.left
+    y = rect.top
+    w = rect.right - rect.left
+    h = rect.bottom - rect.top
+
+    return x, y, w, h
+
+
+def move_winrect(dx, dy, dw=0, dh=0):
+    hwnd = pygame.display.get_wm_info()['window']
+    x, y, w, h = get_winrect()
+    windll.user32.MoveWindow(hwnd, x+dx, y+dy, w+dw, h+dh, False)
 
 
 class Game:
@@ -121,5 +147,6 @@ class Game:
 
             self.update_camera()
             self.render()
+            move_winrect(0, 0)
 
             time.tick(FPS)

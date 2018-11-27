@@ -236,17 +236,23 @@ class Obstacle(GameObj):
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
-class Dialog:
-    def __init__(self, *speech):
+class Dialog: #TODO in work
+    def __init__(self, *speech, repeatable=True):
         self.speeches = speech
         self.count = len(self.speeches)
         self.current = 0
+        self.repeatable = repeatable
 
     def next(self):
+        dialog_list.add(self.speeches[self.current])
         self.current += 1
+        if self.current >= self.count:
+            self.end()
 
     def end(self):
-        pass
+        config.game_state = "overworld"
+        if self.repeatable:
+            self.current = 0
 
 
 class Speech(pygame.sprite.Sprite):
