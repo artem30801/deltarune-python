@@ -76,20 +76,22 @@ class Game:
             self.offset_x = (event.dict['size'][0] - self.size_x) // 2
 
     def dialog_control(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
-                for dialog in dialog_list:  # TODO completely fix THAT SHIT
-                    dialog.reset()
-                config.game_state = "overworld"  # TODO fix that shit
+        if config.current_dialog is not None:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
+                    config.current_dialog.skip()
+                    #for dialog in dialog_list:  # TODO completely fix THAT SHIT
+                    #    dialog.reset()
+                    #config.game_state = "overworld"  # TODO fix that shit
 
-            if event.key == pygame.K_LEFT or event.key == ord('a'):
-                pass
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                pass
-            if event.key == pygame.K_UP or event.key == ord('w'):
-                pass
-            if event.key == pygame.K_DOWN or event.key == ord('s'):
-                pass
+                if event.key == pygame.K_LEFT or event.key == ord('a'):
+                    pass
+                if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                    pass
+                if event.key == pygame.K_UP or event.key == ord('w'):
+                    pass
+                if event.key == pygame.K_DOWN or event.key == ord('s'):
+                    pass
 
     def update_camera(self):
         self.camera_x = self.playable.rect.centerx - WIDTH // 2

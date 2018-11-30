@@ -5,6 +5,51 @@ import config
 dialog_list = pygame.sprite.Group()
 
 
+def change_music(music_name=None):
+    if config.current_music != music_name:
+        config.previous_music = config.current_music
+        pygame.mixer.music.stop()
+        if music_name is not None:
+            pygame.mixer.music.load(os.path.join('music', music_name + '.mp3'))
+            pygame.mixer.music.play(-1)
+
+    config.current_music = music_name
+
+
+def get_empty_image(empty_size=(80, 80)):
+    image = pygame.Surface(empty_size)
+    image.set_colorkey(ALPHA)
+    return image
+
+
+class LoadedImages:
+    def __init__(self, img_folder, img_name, count=1, scale2x=True, empty_size=(0, 0)):
+        self.count = count
+        self.images = []
+        for i in range(self.count):
+            if img_name is not None:
+                image = pygame.image.load(
+                    os.path.join('images', img_folder, img_name + str(i+1) + '.png')).convert()
+                image.convert_alpha()
+                image.set_colorkey(ALPHA)
+            else:
+                image = get_empty_image(empty_size)
+            if scale2x:
+                image = pygame.transform.scale2x(image)
+            self.images.append(image)
+        self.image = self.images[0]
+
+
+class LoadedSound:
+    def __init__(self, sound_name):
+        self.sound = pygame.mixer.Sound(os.path.join('SFX', sound_name + '.wav'))
+
+
+class LoadedFont:
+    def __init__(self, font_name, size=35):
+        self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), size)
+
+
 class Room:
     def __init__(self, width, height, music_name=None):
         self.width = width
@@ -16,22 +61,15 @@ class Room:
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.obstacle_list = pygame.sprite.Group()
         self.character_list = pygame.sprite.Group()
-        # TODO list of dialogs
 
         self.camera_screen = pygame.Surface((self.width, self.height))
         self.background = pygame.Surface((self.width, self.height))
 
-    def generate_floor(self, tiles, type_name, back_color=(0, 0, 0)):
+    def generate_floor(self, tiles_map, tiles, back_color=(0, 0, 0)):
         self.background.fill(back_color)
-        images = []
-        for i in range(0, 26 + 1):
-            img = pygame.image.load(os.path.join('images', 'env', 'tiles', type_name, 'tile' + str(i).zfill(3) + '.png')).convert()
-            img = pygame.transform.scale2x(img)
-            img.convert_alpha()
-            # img.set_colorkey(ALPHA)
-            images.append(img)
+        images = tiles.images
 
-        for y, row in enumerate(tiles):
+        for y, row in enumerate(tiles_map):
             for x, tile in enumerate(row):
                 if tile == "ob":
                     obstacle = Obstacle(None, (x * 80, y * 80), boundary=(0, 0, 80, 80))
@@ -57,22 +95,19 @@ class Room:
     def activate(self):
         config.current_room = self
 
-        pygame.mixer.music.stop()
-        if self.music is not None:
-            pygame.mixer.music.load(os.path.join('music', self.music + '.mp3'))
-            pygame.mixer.music.play(-1)
+        change_music(self.music)
 
 
 class RoomPortal:
-    def __init__(self, room1, room2, tp_position=(0, 0), sound_name=None):
+    def __init__(self, room1, room2, tp_position=(0, 0), sound=None):
         self.room1 = room1
         self.room2 = room2
 
         self.tp_position = tp_position
 
         self.sound = None
-        if sound_name is not None:
-            self.sound = pygame.mixer.Sound(os.path.join('SFX', sound_name + '.wav'))
+        if sound is not None:
+            self.sound = sound.sound
 
     def activate(self):
         config.current_game.playable.rect.topleft = self.tp_position
@@ -86,15 +121,15 @@ class RoomPortalStep(RoomPortal):
     def __init__(self, room1, room2, tp_position=(0, 0), position=(0, 0, 80, 80), sound_name=None):
         super().__init__(room1, room2, tp_position, sound_name)
         self.position = position
-        portal = GameObj(None, None, position=(position[0], position[1]))
+        portal = GameObj(None, position=(position[0], position[1]))
         trigger = StepOnTrigger(self, portal)
         room1.bind(portal)
         room1.bind_triggers(trigger)
 
 
 class GameObj(pygame.sprite.Sprite):
-    def __init__(self, img_class, img_name, animation_cycle=1, sprite_count=1, speed=5,
-                 position=(0, 0), empty_size=(80, 85)):
+    def __init__(self, image, animation_cycle=1, sprite_count=1, speed=5,
+                 position=(0, 0), empty_size=(80, 80)):
         pygame.sprite.Sprite.__init__(self)
 
         self.movex = 0
@@ -108,18 +143,10 @@ class GameObj(pygame.sprite.Sprite):
         self.sprite_count = sprite_count
 
         self.images = []
-        for i in range(1, self.sprite_count + 1):
-            if img_name is not None:
-                img = pygame.image.load(os.path.join('images', img_class, img_name + str(i) + '.png')).convert()
-                img.set_colorkey(ALPHA)
-                img.convert_alpha()
-                img = pygame.transform.scale2x(img)
-            else:
-                img = pygame.Surface(empty_size)
-                img.set_colorkey(ALPHA)
-
-            # img = pygame.transform.smoothscale(img, (scale*img.get_width(), scale*img.get_height()))
-            self.images.append(img)
+        if image is not None:
+            self.images = image.images
+        else:
+            self.images.append(get_empty_image(empty_size))
 
         self.image = self.images[0]
         self.rect = self.image.get_rect()
@@ -149,9 +176,14 @@ class GameObj(pygame.sprite.Sprite):
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
+class Tile(GameObj):
+    def __init__(self, image, animation_cycle=1, sprite_count=1, position=(0, 0)):
+        super().__init__(image, animation_cycle, sprite_count, position=position)
+
+
 class Chara(GameObj):
-    def __init__(self, img_name):
-        super().__init__('characters', img_name, 3, 16)
+    def __init__(self, walk_images):
+        super().__init__(walk_images, 3, 16)
 
         self.boundary = (0, 70, 40, 15)
 
@@ -211,8 +243,8 @@ class Chara(GameObj):
 
 
 class Obstacle(GameObj):
-    def __init__(self, img_name, position=(0, 0), boundary=(0, 0, 80, 80), animation_cycle=1, sprite_count=1,):
-        super().__init__('env', img_name, animation_cycle, sprite_count, position=position)
+    def __init__(self, image, position=(0, 0), boundary=(0, 0, 80, 80), animation_cycle=1, sprite_count=1,):
+        super().__init__(image, animation_cycle, sprite_count, position=position)
 
         self.boundary = boundary
 
@@ -236,33 +268,67 @@ class Obstacle(GameObj):
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
-class Dialog: #TODO in work
-    def __init__(self, *speech, repeatable=True):
+class Dialog: #TODO test and music
+    def __init__(self, *speech, repeatable=True, music=None):
         self.speeches = speech
         self.count = len(self.speeches)
         self.current = 0
         self.repeatable = repeatable
 
+    def activate(self):
+        config.current_dialog = self
+        config.game_state = "dialog"
+        self.skip()
+
     def next(self):
-        dialog_list.add(self.speeches[self.current])
-        self.current += 1
+        #test if able to skip
+        if self.speeches[self.current].frame // self.speeches[self.current].frame < len(self.speeches[self.current].frame):
+            self.skip()
+
+    def skip(self):
         if self.current >= self.count:
             self.end()
+        if self.current > 0:
+            self.speeches[self.current-1].reset()
+        self.speeches[self.current].activate(standalone=False)
+        self.current += 1
 
     def end(self):
+        self.speeches[self.current-1].reset()
         config.game_state = "overworld"
+        config.current_dialog = None
+
         if self.repeatable:
             self.current = 0
 
 
+class DialogBox(pygame.sprite.Sprite):
+    def __init__(self, font_name, font_size=36, back=False, position=(0, HEIGHT)):
+        pygame.sprite.Sprite.__init__(self)
+        self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), font_size)
+
+        self.image = 0
+
+    def draw_border(self):
+        speech_height = 200
+        speech_surface = pygame.Surface((WIDTH, speech_height))
+        speech_surface.fill((0, 0, 0))
+        lines_width = 4
+        lines_points = [(0, 0), (WIDTH - lines_width, 0), (WIDTH - lines_width, speech_height - lines_width),
+                        (0, speech_height - lines_width)]
+        pygame.draw.lines(speech_surface, (255, 255, 255), True, lines_points, lines_width * 2)
+
+
 class Speech(pygame.sprite.Sprite):
-    def __init__(self, text, font, img_name, sound_name, speed=3):
+    def __init__(self, text, font_name, img_name, sound_name, speed=3, autoplay_time=0):
         pygame.sprite.Sprite.__init__(self)
         self.text = text
-        self.font = pygame.font.SysFont(font, 72)
+        self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), 36)
         self.size = 150
+
         self.frame = 0
         self.speed = speed
+        self.autoplay = autoplay_time
 
         self.sound = pygame.mixer.Sound(os.path.join('SFX', sound_name + '.wav'))
 
@@ -299,10 +365,11 @@ class Speech(pygame.sprite.Sprite):
                     print(self.text[self.frame//self.speed])
         self.frame += 1
 
-    def activate(self):
-        pygame.mixer.music.pause()
+    def activate(self, standalone=True):
+        if standalone:
+            pygame.mixer.music.pause()
+            config.game_state = "dialog"
         dialog_list.add(self)
-        config.game_state = "dialog"
 
     def reset(self):
         dialog_list.remove(self)

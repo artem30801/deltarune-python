@@ -36,7 +36,6 @@ fake_screen = screen.copy()
 
 pygame.display.set_caption("SURVEY_PROGRAM")
 
-
 # Tick-tock clock
 FPS = 30
 time = pygame.time.Clock()
