@@ -3,11 +3,15 @@ kris_walk = LoadedImages("characters", "kris_w_d", 16)
 
 dark_tree = LoadedImages("env", "tree_d_r", scale2x=False)
 boombox = LoadedImages("env", "boombox", 2)
-blook_house = LoadedImages("env", "blookhouse", 1)
+blook_house = LoadedImages("env", "blookhouse")
 
 tiles_df = LoadedImages("env\\tiles\\dark_forest", "tile", 27)
 
+lancer_dank = LoadedImages("dialog", "lanc_dank")
+
 portal_sound = LoadedSound("snd_phone")
+
+dtm_mono = LoadedFont("DTM-Mono")
 
 ob = "ob"
 no = "no"
@@ -28,31 +32,35 @@ room1 = Room(960, 960, "fofdr")
 room2 = Room(800, 600, "27. April 2012")
 
 kris = Chara(kris_walk)
-dialog1 = Speech("Avoid tree, bud", "DTM-Mono", "lanc_dank", "talk_default", 3)
-dialog2 = Speech("Thus is NOT your home", "DTM-Mono", "lanc_dank", "talk_default", 3)
-dialog3 = Speech("Such a sweet music", "DTM-Mono", "lanc_dank", "talk_default", 3)
+#dialog1 = Speech("Avoid tree, bud", "DTM-Mono", "lanc_dank", "talk_default", 3)
+#dialog2 = Speech("Thus is NOT your home", "DTM-Mono", "lanc_dank", "talk_default", 3)
+#dialog3 = Speech("Such a sweet music", "DTM-Mono", "lanc_dank", "talk_default", 3)
 
-dialogsss = Dialog(dialog1, dialog2, dialog3)
+#dialogsss = Dialog(dialog1, dialog2, dialog3)
 
 tree1 = Obstacle(dark_tree, (550, 100), (65, 160, 65, 25))
-boombox = Obstacle(boombox, (400, 300), (0, 0, 80, 80), 10, 2)
+boombox = Obstacle(boombox, (400, 300), (0, 0, 80, 80), 10)
 
 blookhouse = Obstacle(blook_house, (100, 0), (0, 200, 183, 58))
 
+test_box = DialogSpeech(["Heya. ... ", "So, i've got a question for ya.", "Do you wanna have a bad time ?"], dtm_mono, lancer_dank, portal_sound)
 
-room1.bind(kris, tree1, blookhouse)
+room1.bind(kris, tree1, blookhouse, test_box)
 room2.bind(kris, boombox)
 
 portal12 = RoomPortalStep(room1, room2, (100, 300), (950, 560, 10, 80), portal_sound)
 portal21 = RoomPortalStep(room2, room1, (870, 555), (0, 300, 10, 80), portal_sound)
 
+#fade = AnimOverlay(10, False)
+#fade.activate()
 
-trig1 = InteractTrigger(dialogsss, tree1)
-trig2 = InteractTrigger(dialog2, blookhouse)
-trig3 = InteractTrigger(dialog3, boombox)
 
-room1.bind_triggers(trig1, trig2)
-room2.bind_triggers(trig3)
+#trig1 = InteractTrigger(dialogsss, tree1)
+#trig2 = InteractTrigger(dialog2, blookhouse)
+#trig3 = InteractTrigger(dialog3, boombox)
+
+#room1.bind_triggers(trig1, trig2)
+#room2.bind_triggers(trig3)
 
 room1.generate_floor(lvl1_disign, tiles_df)
 room1.activate()

@@ -9,7 +9,7 @@ pygame.mixer.pre_init(44100, -16, 64, 1024)
 pygame.init()
 pygame.mixer.quit()
 pygame.mixer.init(44100, -16, 64, 1024)
-pygame.init()
+#pygame.init()
 
 # Init sound
 #file_wav = wave.open(os.path.join('SFX', "talk_default" + '.wav'))
@@ -33,6 +33,10 @@ pygame.display.set_icon(icon)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), HWSURFACE | DOUBLEBUF | RESIZABLE)
 fake_screen = screen.copy()
+
+alpha_surface = fake_screen.copy()
+alpha_surface.fill((0, 0, 0))  # Fill it with whole white before the main-loop.
+alpha_surface.set_alpha(0)
 
 pygame.display.set_caption("SURVEY_PROGRAM")
 

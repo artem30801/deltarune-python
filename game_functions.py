@@ -6,8 +6,6 @@ user32 = windll.user32
 screensize = user32.GetSystemMetrics(78), user32.GetSystemMetrics(79)
 
 config.game_state = "overworld"
-fake_screen = screen.copy()
-
 
 def get_winrect():
     hwnd = pygame.display.get_wm_info()['window']
@@ -38,8 +36,6 @@ class Game:
 
         self.camera_x = 0
         self.camera_y = 0
-
-        self.degree = 0
 
         self.playable = player
 
@@ -80,9 +76,6 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
                     config.current_dialog.skip()
-                    #for dialog in dialog_list:  # TODO completely fix THAT SHIT
-                    #    dialog.reset()
-                    #config.game_state = "overworld"  # TODO fix that shit
 
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     pass
@@ -110,7 +103,11 @@ class Game:
         config.current_room.all_sprites.draw(config.current_room.camera_screen)
 
         fake_screen.blit(config.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
-        dialog_list.draw(fake_screen)
+
+        alpha_surface.set_alpha(config.alpha_overlay)
+        fake_screen.blit(alpha_surface, (0, 0))
+
+        dialog_layer.draw(fake_screen)
 
         # render fake screen
         screen.blit(pygame.transform.scale(fake_screen, (self.size_x, self.size_y)), (self.offset_x, 0))
@@ -145,8 +142,10 @@ class Game:
                 self.playable.stop()
 
             if config.game_state == "dialog":
-                dialog_list.update()
+                dialog_layer.update()
 
+            for anim in active_animations:
+                anim.action_frame()
             self.update_camera()
             self.render()
             move_winrect(0, 0)

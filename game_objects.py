@@ -2,7 +2,8 @@ from game_init import *
 import config
 
 
-dialog_list = pygame.sprite.Group()
+dialog_layer = pygame.sprite.Group()
+active_animations = []
 
 
 def change_music(music_name=None):
@@ -46,15 +47,15 @@ class LoadedSound:
 
 
 class LoadedFont:
-    def __init__(self, font_name, size=35):
+    def __init__(self, font_name, size=36):
         self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), size)
 
 
 class Room:
-    def __init__(self, width, height, music_name=None):
+    def __init__(self, width, height, music=None):
         self.width = width
         self.height = height
-        self.music = music_name
+        self.music = music
 
         self.triggers_list = []
 
@@ -104,6 +105,8 @@ class RoomPortal:
         self.room2 = room2
 
         self.tp_position = tp_position
+        self.fadeout = AnimOverlay(30, True)
+        self.fadein = AnimOverlay(30, False)
 
         self.sound = None
         if sound is not None:
@@ -114,7 +117,9 @@ class RoomPortal:
         if self.sound is not None:
             self.sound.play()
         if config.current_room == self.room1:
+            self.fadeout.activate()
             self.room2.activate()
+            self.fadein.activate()
 
 
 class RoomPortalStep(RoomPortal):
@@ -128,7 +133,7 @@ class RoomPortalStep(RoomPortal):
 
 
 class GameObj(pygame.sprite.Sprite):
-    def __init__(self, image, animation_cycle=1, sprite_count=1, speed=5,
+    def __init__(self, image, animation_cycle=1, speed=5,
                  position=(0, 0), empty_size=(80, 80)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -140,13 +145,14 @@ class GameObj(pygame.sprite.Sprite):
 
         self.frame = 0
         self.animation_cycle = animation_cycle
-        self.sprite_count = sprite_count
 
         self.images = []
         if image is not None:
             self.images = image.images
+            self.sprite_count = image.count
         else:
             self.images.append(get_empty_image(empty_size))
+            self.sprite_count = 1
 
         self.image = self.images[0]
         self.rect = self.image.get_rect()
@@ -177,13 +183,13 @@ class GameObj(pygame.sprite.Sprite):
 
 
 class Tile(GameObj):
-    def __init__(self, image, animation_cycle=1, sprite_count=1, position=(0, 0)):
-        super().__init__(image, animation_cycle, sprite_count, position=position)
+    def __init__(self, image, animation_cycle=1, position=(0, 0)):
+        super().__init__(image, animation_cycle, position=position)
 
 
 class Chara(GameObj):
     def __init__(self, walk_images):
-        super().__init__(walk_images, 3, 16)
+        super().__init__(walk_images, 3)
 
         self.boundary = (0, 70, 40, 15)
 
@@ -243,8 +249,8 @@ class Chara(GameObj):
 
 
 class Obstacle(GameObj):
-    def __init__(self, image, position=(0, 0), boundary=(0, 0, 80, 80), animation_cycle=1, sprite_count=1,):
-        super().__init__(image, animation_cycle, sprite_count, position=position)
+    def __init__(self, image, position=(0, 0), boundary=(0, 0, 80, 80), animation_cycle=1):
+        super().__init__(image, animation_cycle, position=position)
 
         self.boundary = boundary
 
@@ -302,21 +308,97 @@ class Dialog: #TODO test and music
             self.current = 0
 
 
-class DialogBox(pygame.sprite.Sprite):
-    def __init__(self, font_name, font_size=36, back=False, position=(0, HEIGHT)):
+class DialogBox(pygame.sprite.Sprite):  # Baisic class, do not call directly
+    def __init__(self, font, position=(20, 400), size=(760, 180)):
         pygame.sprite.Sprite.__init__(self)
-        self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), font_size)
+        self.font = font.font
 
-        self.image = 0
+        self.rect = pygame.Rect(position, size)
+        self.image = self.draw_all()
+        #self.draw_textbox(["Heya. ... ", "So, i've got a question for ya.", "Do you think even the worst person can change. . . ?"], ((10, 10), size))
 
     def draw_border(self):
-        speech_height = 200
-        speech_surface = pygame.Surface((WIDTH, speech_height))
-        speech_surface.fill((0, 0, 0))
+        border_surface = pygame.Surface(self.rect.size)
+        border_surface.fill((0, 0, 0))
         lines_width = 4
-        lines_points = [(0, 0), (WIDTH - lines_width, 0), (WIDTH - lines_width, speech_height - lines_width),
-                        (0, speech_height - lines_width)]
-        pygame.draw.lines(speech_surface, (255, 255, 255), True, lines_points, lines_width * 2)
+        pygame.draw.rect(border_surface, (255, 255, 255),
+                         (lines_width//2, lines_width//2, self.rect.width - lines_width, self.rect.height - lines_width), lines_width)
+        return border_surface
+
+    def draw_textbox(self, lines, rect, text_color=(255, 255, 255), aa=False):
+        rect = pygame.Rect(rect)
+        y = rect.top
+        line_spacing = -2
+        font_height = self.font.size("Tg")[1]
+        for line in lines:
+            while line:
+                i = 1
+                if y + font_height > rect.bottom:
+                    break
+                while self.font.size(line[:i])[0] < rect.width and i < len(line):
+                    i += 1
+                if i < len(line):
+                    i = line.rfind(" ", 0, i) + 1
+                text_surf = self.font.render(line[:i], aa, text_color)
+                self.image.blit(text_surf, (rect.left, y))
+                y += font_height + line_spacing
+                line = line[i:]
+
+    def draw_all(self):
+        surface = self.draw_border()
+        return surface
+
+
+class DialogSpeech(DialogBox):
+    def __init__(self, lines, font, face_image=None, sound=None, speed=3):
+        super().__init__(font)
+        self.frame = 0
+        self.speed = speed
+
+        self.lines = lines
+
+        if sound is not None:
+            self.sound = sound.sound
+
+        if face_image is not None:
+            self.face = face_image.image
+            self.text_rect = pygame.Rect((170, 20), (620, 140))
+            self.image.blit(self.face, (10, 10))
+        else:
+            self.face = None
+            self.text_rect = pygame.Rect((20, 20), (720, 140))
+
+        self.x = 0
+        self.y = 0
+
+        self.current_color = (255, 255, 255)
+
+    def normalize_lines(self):  # todo перенос строк - разбиение списка по ширине строки
+        line_width = self.font.size(self.lines[self.y])[0]
+
+    def update(self, aa=False):
+        if self.y < len(self.lines):
+            if self.frame % self.speed == 0:
+                if self.lines[self.y][self.x] == "/":  # todo смена цвета печати по символу после слеша
+                    pass
+                line_spacing = -2
+                letter_spacing = 1
+                font_height = self.font.size("Tg")[1]
+                font_width = self.font.size(self.lines[self.y][self.x])[0]
+                text_surf = self.font.render(self.lines[self.y][self.x], aa, self.current_color)
+
+                self.image.blit(text_surf, (self.text_rect.left + self.x * (font_width + letter_spacing),
+                                            self.text_rect.top + self.y * (font_height + line_spacing)))
+
+                if self.sound is not None:
+                    if self.lines[self.y][self.x] != " ":
+                        self.sound.play()
+
+                self.x += 1
+                if self.x >= len(self.lines[self.y]):
+                    self.x = 0
+                    self.y += 1
+        self.frame += 1
 
 
 class Speech(pygame.sprite.Sprite):
@@ -369,10 +451,10 @@ class Speech(pygame.sprite.Sprite):
         if standalone:
             pygame.mixer.music.pause()
             config.game_state = "dialog"
-        dialog_list.add(self)
+        dialog_layer.add(self)
 
     def reset(self):
-        dialog_list.remove(self)
+        dialog_layer.remove(self)
         self.frame = 0
         pygame.mixer.music.unpause()
 
@@ -383,8 +465,7 @@ class DialogChoice:  #TODO
 
 class Trigger:
     def __init__(self, result, once=False):
-        self.count = 0
-        self.triggered = False
+        self.counter = 0
         self.once = once
 
         self.result = result
@@ -393,6 +474,7 @@ class Trigger:
         pass
 
     def action(self):
+        self.counter += 1
         if self.once:
             config.current_room.triggers_list.remove(self)
         self.result.activate()
@@ -404,11 +486,10 @@ class InteractTrigger(Trigger):
         self.target = target
 
     def check(self, event):
-        if not self.triggered:
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_RETURN or event.key == ord('z'):
-                    if config.current_game.playable.vicinity_rect.colliderect(self.target.footprint_rect):
-                        self.action()
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_RETURN or event.key == ord('z'):
+                if config.current_game.playable.vicinity_rect.colliderect(self.target.footprint_rect):
+                    self.action()
 
 
 class StepOnTrigger(Trigger):
@@ -417,6 +498,44 @@ class StepOnTrigger(Trigger):
         self.target = target
 
     def check(self, event):
-        if not self.triggered:
-            if config.current_game.playable.footprint_rect.colliderect(self.target.rect):
-                self.action()
+        if config.current_game.playable.footprint_rect.colliderect(self.target.rect):
+            self.action()
+
+
+class Animation:
+    def __init__(self, frames, target):
+        self.frames = frames
+
+        self.target_value = target
+        self.current_value = 0
+        self.delta_value = 0
+
+    def activate(self):
+        active_animations.append(self)
+
+    def end(self):
+        active_animations.remove(self)
+
+    def check(self):
+        if self.current_value >= self.target_value:
+            self.end()
+            print("end")
+
+    def action_frame(self):
+        pass
+
+
+class AnimOverlay(Animation):
+    def __init__(self, frames, fadein: bool):
+        if fadein:
+            target = 0
+        else:
+            target = 256
+        super().__init__(frames, target)
+        self.delta_value = (target-config.alpha_overlay)/frames
+
+    def action_frame(self):
+        config.alpha_overlay = self.current_value
+        self.current_value += self.delta_value
+        self.check()
+        print(self.current_value)
