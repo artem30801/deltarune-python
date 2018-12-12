@@ -105,8 +105,8 @@ class RoomPortal:
         self.room2 = room2
 
         self.tp_position = tp_position
-        self.fadeout = AnimOverlay(30, True)
-        self.fadein = AnimOverlay(30, False)
+        #self.fadeout = AnimOverlay(30, True)
+        #self.fadein = AnimOverlay(30, False)
 
         self.sound = None
         if sound is not None:
@@ -117,9 +117,9 @@ class RoomPortal:
         if self.sound is not None:
             self.sound.play()
         if config.current_room == self.room1:
-            self.fadeout.activate()
+            #self.fadeout.activate() сейчас функция не работает
             self.room2.activate()
-            self.fadein.activate()
+            #self.fadein.activate() и эта тоже
 
 
 class RoomPortalStep(RoomPortal):
@@ -231,8 +231,7 @@ class Chara(GameObj):
                 if self.movex != 0:
                     collide_x = True
                 if self.movey != 0:
-                    collide_y = True
-        # collide with room border
+                    collide_y = True # collide with room border
         if self.rect.x < 0 or self.rect.right > config.current_room.width:
             collide_x = True
         if self.rect.y < 0 or self.rect.bottom > config.current_room.height:
