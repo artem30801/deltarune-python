@@ -1,7 +1,6 @@
 from game_init import *
 import config
 
-
 dialog_layer = pygame.sprite.Group()
 active_animations = []
 
@@ -49,7 +48,6 @@ class LoadedSound:
 class LoadedFont:
     def __init__(self, font_name, size=36):
         self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), size)
-
 
 class Room:
     def __init__(self, width, height, music=None):
@@ -133,7 +131,7 @@ class RoomPortalStep(RoomPortal):
 
 
 class GameObj(pygame.sprite.Sprite):
-    def __init__(self, image, animation_cycle=1, speed=5,
+    def __init__(self, image, animation_cycle=1, speed=20,
                  position=(0, 0), empty_size=(80, 80)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -198,7 +196,7 @@ class Chara(GameObj):
                                                 self.boundary[2], self.boundary[3]
                                                 ))
 
-        self.vicinity_rect = self.rect.inflate(10, 10)
+        self.vicinity_rect = self.rect.inflate(2,2)
         self.vicinity_rect.center = self.rect.center
 
     def update(self):
