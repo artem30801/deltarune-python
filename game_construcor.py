@@ -45,7 +45,7 @@ blookhouse = Obstacle(blook_house, (100, 0), (0, 200, 183, 58))
 
 test_box = DialogSpeech(["Heya. ... ", "So, i've got a question for ya.", "Do you wanna have a bad time ?"], dtm_mono, lancer_dank, portal_sound)
 
-room1.bind(kris, tree1, blookhouse, test_box)
+room1.bind(kris, tree1, blookhouse)
 room2.bind(kris, boombox)
 
 portal12 = RoomPortalStep(room1, room2, (100, 300), (950, 560, 10, 80), portal_sound)

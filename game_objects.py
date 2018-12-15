@@ -105,8 +105,8 @@ class RoomPortal:
         self.room2 = room2
 
         self.tp_position = tp_position
-        self.fadeout = AnimOverlay(30, True)
-        self.fadein = AnimOverlay(30, False)
+        self.fadeout = AnimOverlay(8, False)
+        self.fadein = AnimOverlay(8, True)
 
         self.sound = None
         if sound is not None:
@@ -505,6 +505,7 @@ class StepOnTrigger(Trigger):
 class Animation:
     def __init__(self, frames, target):
         self.frames = frames
+        self.current_frame = 0
 
         self.target_value = target
         self.current_value = 0
@@ -515,9 +516,11 @@ class Animation:
 
     def end(self):
         active_animations.remove(self)
+        self.current_frame = 0
+        self.current_value = 0
 
     def check(self):
-        if self.current_value >= self.target_value:
+        if self.current_frame == self.frames:
             self.end()
             print("end")
 
@@ -532,10 +535,11 @@ class AnimOverlay(Animation):
         else:
             target = 256
         super().__init__(frames, target)
-        self.delta_value = (target-config.alpha_overlay)/frames
+        self.delta_value = (target-config.alpha_overlay)//frames
 
     def action_frame(self):
         config.alpha_overlay = self.current_value
         self.current_value += self.delta_value
+        self.current_frame += 1
         self.check()
         print(self.current_value)

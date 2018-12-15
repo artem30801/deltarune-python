@@ -144,8 +144,9 @@ class Game:
             if config.game_state == "dialog":
                 dialog_layer.update()
 
-            for anim in active_animations:
-                anim.action_frame()
+            if active_animations:
+                active_animations[0].action_frame()
+
             self.update_camera()
             self.render()
             move_winrect(0, 0)
