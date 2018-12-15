@@ -1,7 +1,6 @@
 from game_init import *
 import config
 
-
 dialog_layer = pygame.sprite.Group()
 active_animations = []
 
@@ -49,7 +48,6 @@ class LoadedSound:
 class LoadedFont:
     def __init__(self, font_name, size=36):
         self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), size)
-
 
 class Room:
     def __init__(self, width, height, music=None):
@@ -117,9 +115,9 @@ class RoomPortal:
         if self.sound is not None:
             self.sound.play()
         if config.current_room == self.room1:
-            self.fadeout.activate()
+            #self.fadeout.activate() сейчас функция не работает
             self.room2.activate()
-            self.fadein.activate()
+            #self.fadein.activate() и эта тоже
 
 
 class RoomPortalStep(RoomPortal):
@@ -133,7 +131,7 @@ class RoomPortalStep(RoomPortal):
 
 
 class GameObj(pygame.sprite.Sprite):
-    def __init__(self, image, animation_cycle=1, speed=5,
+    def __init__(self, image, animation_cycle=1, speed=20,
                  position=(0, 0), empty_size=(80, 80)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -198,7 +196,7 @@ class Chara(GameObj):
                                                 self.boundary[2], self.boundary[3]
                                                 ))
 
-        self.vicinity_rect = self.rect.inflate(10, 10)
+        self.vicinity_rect = self.rect.inflate(2,2)
         self.vicinity_rect.center = self.rect.center
 
     def update(self):
@@ -231,8 +229,7 @@ class Chara(GameObj):
                 if self.movex != 0:
                     collide_x = True
                 if self.movey != 0:
-                    collide_y = True
-        # collide with room border
+                    collide_y = True # collide with room border
         if self.rect.x < 0 or self.rect.right > config.current_room.width:
             collide_x = True
         if self.rect.y < 0 or self.rect.bottom > config.current_room.height:

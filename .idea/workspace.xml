@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a8af0edd-7d24-4693-b902-37f3d5d05de8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/game_construcor.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_construcor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game_objects.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_objects.py" afterDir="false" />
-    </list>
+    <list default="true" id="a8af0edd-7d24-4693-b902-37f3d5d05de8" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,14 +12,15 @@
     <session id="1141674294">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="4" />
+          <entry key="project.closed" value="5" />
+          <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="2" />
           <entry key="project.open.time.5" value="1" />
           <entry key="project.open.time.6" value="1" />
           <entry key="project.open.time.7" value="1" />
           <entry key="project.open.time.8" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="7" />
+          <entry key="project.opened" value="8" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -83,7 +80,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
+            <state relative-caret-position="153">
               <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
             </state>
           </provider>
@@ -92,8 +89,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/game_objects.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-268">
-              <caret line="515" lean-forward="true" selection-start-line="515" selection-end-line="515" />
+            <state relative-caret-position="119">
+              <caret line="521" column="20" lean-forward="true" selection-start-line="521" selection-start-column="20" selection-end-line="521" selection-end-column="20" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
                 <marker date="1544362136154" expanded="true" signature="16687:17070" ph="..." />
@@ -162,21 +159,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
-              <item name="deltarune-python" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
       <pane id="Scope">
         <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
           <expand>
@@ -194,6 +176,21 @@
               <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
               <item name="images" type="9f88c78c:ScopeViewTreeModel$FileNode" />
               <item name="dialog" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="deltarune-python" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
@@ -404,7 +401,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1719" height="932" extended-state="7" />
+    <frame x="-6" y="-6" width="1719" height="932" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.252819" />
@@ -533,6 +530,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/game_init.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="578">
@@ -543,17 +547,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/game_objects.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-268">
-          <caret line="515" lean-forward="true" selection-start-line="515" selection-end-line="515" />
+        <state relative-caret-position="119">
+          <caret line="521" column="20" lean-forward="true" selection-start-line="521" selection-start-column="20" selection-end-line="521" selection-end-column="20" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
             <marker date="1544362136154" expanded="true" signature="16687:17070" ph="..." />
