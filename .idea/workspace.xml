@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a8af0edd-7d24-4693-b902-37f3d5d05de8" name="Default Changelist" comment="" />
+    <list default="true" id="a8af0edd-7d24-4693-b902-37f3d5d05de8" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_construcor.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_construcor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_objects.py" beforeDir="false" afterPath="$PROJECT_DIR$/game_objects.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,12 +19,12 @@
           <entry key="project.closed" value="5" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="2" />
-          <entry key="project.open.time.5" value="1" />
+          <entry key="project.open.time.5" value="2" />
           <entry key="project.open.time.6" value="1" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.open.time.8" value="1" />
+          <entry key="project.open.time.8" value="2" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="8" />
+          <entry key="project.opened" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -42,14 +46,14 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="21" />
-          <entry key="py" value="10405" />
-          <entry key="txt" value="367" />
+          <entry key="py" value="11121" />
+          <entry key="txt" value="415" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="367" />
-          <entry key="Python" value="10426" />
+          <entry key="PLAIN_TEXT" value="415" />
+          <entry key="Python" value="11142" />
         </counts>
       </usages-collector>
     </session>
@@ -59,8 +63,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/game_construcor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="782">
-              <caret line="46" selection-start-line="46" selection-end-line="47" />
+            <state relative-caret-position="402">
+              <caret line="68" column="28" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -68,8 +72,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/game_functions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2465">
-              <caret line="147" column="16" selection-start-line="147" selection-start-column="16" selection-end-line="147" selection-end-column="16" />
+            <state relative-caret-position="332">
+              <caret line="148" selection-start-line="148" selection-end-line="148" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -77,25 +81,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/game_objects.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="521" column="20" lean-forward="true" selection-start-line="521" selection-start-column="20" selection-end-line="521" selection-end-column="20" />
+            <state relative-caret-position="495">
+              <caret line="388" column="38" lean-forward="true" selection-start-line="388" selection-start-column="38" selection-end-line="388" selection-end-column="38" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
-                <marker date="1544362136154" expanded="true" signature="16687:17070" ph="..." />
-                <marker date="1544362136154" expanded="true" signature="16727:16889" ph="..." />
-                <marker date="1544362136154" expanded="true" signature="17090:17190" ph="..." />
               </folding>
             </state>
           </provider>
@@ -104,11 +96,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/game_init.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="578">
-              <caret line="38" column="26" selection-start-line="38" selection-start-column="14" selection-end-line="38" selection-end-column="26" />
+            <state relative-caret-position="345">
+              <caret line="16" column="17" lean-forward="true" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/config.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="10" selection-start-line="10" selection-end-line="10" />
             </state>
           </provider>
         </entry>
@@ -128,6 +129,7 @@
       <find>game</find>
       <find>current_game</find>
       <find>print</find>
+      <find>Tr</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -142,9 +144,9 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/testing.py" />
         <option value="$PROJECT_DIR$/game_init.py" />
-        <option value="$PROJECT_DIR$/game_construcor.py" />
         <option value="$PROJECT_DIR$/game_functions.py" />
         <option value="$PROJECT_DIR$/config.py" />
+        <option value="$PROJECT_DIR$/game_construcor.py" />
         <option value="$PROJECT_DIR$/game_objects.py" />
       </list>
     </option>
@@ -159,6 +161,21 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="deltarune-python" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope">
         <subPane subId="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope">
           <expand>
@@ -176,21 +193,6 @@
               <item name="" type="442cc68d:ScopeViewTreeModel$RootNode" />
               <item name="images" type="9f88c78c:ScopeViewTreeModel$FileNode" />
               <item name="dialog" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
-              <item name="deltarune-python" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="deltarune-python" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
@@ -397,7 +399,14 @@
       <option name="project" value="LOCAL" />
       <updated>1544162526089</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="FADE IS WORKING NOW&#10;Animations reworked too">
+      <created>1545034904539</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1545034904539</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -409,14 +418,14 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4997071" weight="0.3288835" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49495548" weight="0.2693267" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49376854" visible="true" weight="0.2693267" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39927185" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49851632" weight="0.32793018" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5050445" side_tool="true" visible="true" weight="0.2693267" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5062314" side_tool="true" visible="true" weight="0.2693267" />
       <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.4997071" weight="0.3288835" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -436,7 +445,8 @@
     <MESSAGE value="Gitignorefix" />
     <MESSAGE value="Gitignorefix. Finally added ENV images" />
     <MESSAGE value="work in progress version. doing dialgos\animations" />
-    <option name="LAST_COMMIT_MESSAGE" value="work in progress version. doing dialgos\animations" />
+    <MESSAGE value="FADE IS WORKING NOW&#10;Animations reworked too" />
+    <option name="LAST_COMMIT_MESSAGE" value="FADE IS WORKING NOW&#10;Animations reworked too" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/images/env/tiles/dark_forest/tile000.png" />
@@ -513,49 +523,46 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/game_construcor.py">
+    <entry file="file://$PROJECT_DIR$/config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="782">
-          <caret line="46" selection-start-line="46" selection-end-line="47" />
+        <state relative-caret-position="170">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/game_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2465">
-          <caret line="147" column="16" selection-start-line="147" selection-start-column="16" selection-end-line="147" selection-end-column="16" />
+        <state relative-caret-position="332">
+          <caret line="148" selection-start-line="148" selection-end-line="148" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/game_init.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="38" column="26" selection-start-line="38" selection-start-column="14" selection-end-line="38" selection-end-column="26" />
+        <state relative-caret-position="345">
+          <caret line="16" column="17" lean-forward="true" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/game_construcor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="402">
+          <caret line="68" column="28" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/game_objects.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="521" column="20" lean-forward="true" selection-start-line="521" selection-start-column="20" selection-end-line="521" selection-end-column="20" />
+        <state relative-caret-position="495">
+          <caret line="388" column="38" lean-forward="true" selection-start-line="388" selection-start-column="38" selection-end-line="388" selection-end-column="38" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <marker date="1544362136154" expanded="true" signature="16687:17070" ph="..." />
-            <marker date="1544362136154" expanded="true" signature="16727:16889" ph="..." />
-            <marker date="1544362136154" expanded="true" signature="17090:17190" ph="..." />
           </folding>
         </state>
       </provider>

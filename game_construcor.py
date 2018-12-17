@@ -66,7 +66,7 @@ heart = Obstacle(heart, (10,740), (0 ,00 , 30 ,60 )  )
 sale = Obstacle(sale, (100, 80), (0, 0, 108, 166))
 sales = Obstacle(sales,(580, 80),(0, 0, 108, 166))
 
-test_box = DialogSpeech(["Heya. ... ", "So, i've got a question for ya.", "Do you wanna have a bad time ?"], dtm_mono, lancer_dank, portal_sound)
+test_box = DialogSpeech(["Heya. ... ", "So, i've got a question for ya.", "Do you wanna have a /rbad/w time ?"], dtm_mono, lancer_dank, portal_sound)
 
 room1.bind(kris, tree1, blookhouse, test_box)
 room2.bind(kris, boombox, cantr)

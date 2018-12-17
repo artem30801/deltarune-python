@@ -200,7 +200,7 @@ class Chara(GameObj):
                                                 self.boundary[2], self.boundary[3]
                                                 ))
 
-        self.vicinity_rect = self.rect.inflate(2,2)
+        self.vicinity_rect = self.rect.inflate(2, 2)
         self.vicinity_rect.center = self.rect.center
 
     def update(self):
@@ -275,7 +275,7 @@ class Obstacle(GameObj):
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
-class Dialog: #TODO test and music
+class Dialog: # TODO test and music
     def __init__(self, *speech, repeatable=True, music=None):
         self.speeches = speech
         self.count = len(self.speeches)
@@ -381,7 +381,14 @@ class DialogSpeech(DialogBox):
         if self.y < len(self.lines):
             if self.frame % self.speed == 0:
                 if self.lines[self.y][self.x] == "/":  # todo смена цвета печати по символу после слеша
-                    pass
+
+                    command = self.lines[self.y][self.x+1]
+                    self.lines[self.y] = self.lines[self.y][:self.x] + self.lines[self.y][self.x + 2:]
+                    if command == "r":
+                        self.current_color = (255, 0, 0)
+                    if command == "w":
+                        self.current_color = (255, 255, 255)
+
                 line_spacing = -2
                 letter_spacing = 1
                 font_height = self.font.size("Tg")[1]
