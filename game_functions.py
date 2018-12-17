@@ -53,8 +53,7 @@ class Game:
             if event.key == pygame.K_DOWN or event.key == ord('s'):
                 self.playable.control_speed(0, 1)
             if event.key == ord('x'):
-                self.playable.speed = 15
-
+                self.playable.speed = 10
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == ord('a'):
@@ -67,7 +66,6 @@ class Game:
                 self.playable.control_speed(0, -1)
             if event.key == ord('x'):
                 self.playable.speed = 5
-
 
     def resize(self, event):
         if event.type == VIDEORESIZE:
@@ -83,7 +81,8 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
                     config.current_dialog.skip()
-
+                if event.key == pygame.K_RETURN or event.key == ord('z'):
+                    config.current_dialog.next()
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     pass
                 if event.key == pygame.K_RIGHT or event.key == ord('d'):
@@ -151,8 +150,8 @@ class Game:
             if config.game_state == "dialog":
                 dialog_layer.update()
 
-            if active_animations:
-                active_animations[0].action_frame()
+            for animation in active_animations:
+                animation.action_frame()
 
             self.update_camera()
             self.render()

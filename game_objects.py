@@ -44,6 +44,9 @@ class LoadedSound:
     def __init__(self, sound_name):
         self.sound = pygame.mixer.Sound(os.path.join('SFX', sound_name + '.wav'))
 
+    def activate(self):
+        self.sound.play()
+
 
 class LoadedFont:
     def __init__(self, font_name, size=36):
@@ -281,7 +284,7 @@ class Obstacle(GameObj):
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
-class Dialog: # TODO test and music
+class Dialog:  # TODO test and music
     def __init__(self, *speech, repeatable=True, music=None):
         self.speeches = speech
         self.count = len(self.speeches)
@@ -295,16 +298,17 @@ class Dialog: # TODO test and music
 
     def next(self):
         #test if able to skip
-        if self.speeches[self.current].frame // self.speeches[self.current].frame < len(self.speeches[self.current].frame):
+        if self.speeches[self.current-1].done:
             self.skip()
 
     def skip(self):
         if self.current >= self.count:
             self.end()
-        if self.current > 0:
-            self.speeches[self.current-1].reset()
-        self.speeches[self.current].activate(standalone=False)
-        self.current += 1
+        else:
+            if self.current > 0:
+                self.speeches[self.current-1].reset()
+            self.speeches[self.current].activate()
+            self.current += 1
 
     def end(self):
         self.speeches[self.current-1].reset()
@@ -319,6 +323,7 @@ class DialogBox(pygame.sprite.Sprite):  # Baisic class, do not call directly
     def __init__(self, font, position=(20, 400), size=(760, 180)):
         pygame.sprite.Sprite.__init__(self)
         self.font = font.font
+        self.done = False
 
         self.rect = pygame.Rect(position, size)
         self.image = self.draw_all()
@@ -355,22 +360,30 @@ class DialogBox(pygame.sprite.Sprite):  # Baisic class, do not call directly
         surface = self.draw_border()
         return surface
 
+    def activate(self):
+        dialog_layer.add(self)
+
+    def reset(self):
+        self.kill()
+
 
 class DialogSpeech(DialogBox):
     def __init__(self, lines, font, face_image=None, sound=None, speed=3):
+        self.face = None
         super().__init__(font)
         self.frame = 0
         self.speed = speed
 
+        self.inp_lines = lines[:]
         self.lines = lines
 
         if sound is not None:
             self.sound = sound.sound
 
         if face_image is not None:
-            self.face = face_image.image
+            self.face = pygame.transform.scale(face_image.image, (160, 160))
             self.text_rect = pygame.Rect((170, 20), (620, 140))
-            self.image.blit(self.face, (10, 10))
+            #self.image.blit(self.face, (10, 10))
         else:
             self.face = None
             self.text_rect = pygame.Rect((20, 20), (720, 140))
@@ -379,52 +392,70 @@ class DialogSpeech(DialogBox):
         self.y = 0
 
         self.current_color = (255, 255, 255)
+        self.image = self.draw_all()
+
+    def draw_all(self):
+        surface = self.draw_border()
+        if self.face is not None:
+            surface.blit(self.face, (10, 10))
+        return surface
 
     def normalize_lines(self):  # todo перенос строк - разбиение списка по ширине строки
         line_width = self.font.size(self.lines[self.y])[0]
 
     def update(self, aa=False):
-        if self.y < len(self.lines):
-            if self.frame % self.speed == 0:
-                if self.lines[self.y][self.x] == "/":  # todo смена цвета печати по символу после слеша
+        if not self.done:
+            if self.y < len(self.lines):
+                if self.frame % self.speed == 0:
+                    if self.lines[self.y][self.x] == "/":
+                        command = self.lines[self.y][self.x+1]
+                        self.lines[self.y] = self.lines[self.y][:self.x] + self.lines[self.y][self.x + 2:]
+                        if command == "r":
+                            self.current_color = (255, 0, 0)  # тут вложенный звиздец - 5 гребаных ифов
+                        if command == "g":
+                            self.current_color = (0, 255, 0)
+                        if command == "b":
+                            self.current_color = (0, 0, 255)
+                        if command == "y":
+                            self.current_color = (255, 255, 0)
+                        if command == "a":
+                            self.current_color = (0, 255, 255)
+                        if command == "v":
+                            self.current_color = (255, 0, 255)
+                        if command == "o":
+                            self.current_color = (255, 127, 0)
+                        if command == "w":
+                            self.current_color = (255, 255, 255)
 
-                    command = self.lines[self.y][self.x+1]
-                    self.lines[self.y] = self.lines[self.y][:self.x] + self.lines[self.y][self.x + 2:]
-                    if command == "r":
-                        self.current_color = (255, 0, 0)
-                    if command == "g":
-                        self.current_color = (0, 255, 0)
-                    if command == "b":
-                        self.current_color = (0, 0, 255)
-                    if command == "y":
-                        self.current_color = (255, 255, 0)
-                    if command == "a":
-                        self.current_color = (0, 255, 255)
-                    if command == "v":
-                        self.current_color = (255, 0, 255)
-                    if command == "o":
-                        self.current_color = (255, 127, 0)
-                    if command == "w":
-                        self.current_color = (255, 255, 255)
+                    line_spacing = -2
+                    letter_spacing = 1
+                    font_height = self.font.size("Tg")[1]
+                    font_width = self.font.size(self.lines[self.y][self.x])[0]
+                    text_surf = self.font.render(self.lines[self.y][self.x], aa, self.current_color)
 
-                line_spacing = -2
-                letter_spacing = 1
-                font_height = self.font.size("Tg")[1]
-                font_width = self.font.size(self.lines[self.y][self.x])[0]
-                text_surf = self.font.render(self.lines[self.y][self.x], aa, self.current_color)
+                    self.image.blit(text_surf, (self.text_rect.left + self.x * (font_width + letter_spacing),
+                                                self.text_rect.top + self.y * (font_height + line_spacing)))
 
-                self.image.blit(text_surf, (self.text_rect.left + self.x * (font_width + letter_spacing),
-                                            self.text_rect.top + self.y * (font_height + line_spacing)))
+                    if self.sound is not None:
+                        if self.lines[self.y][self.x] != " ":
+                            self.sound.play()
 
-                if self.sound is not None:
-                    if self.lines[self.y][self.x] != " ":
-                        self.sound.play()
+                    self.x += 1
+                    if self.x >= len(self.lines[self.y]):
+                        self.x = 0
+                        self.y += 1
+            else:
+                self.done = True
+            self.frame += 1
 
-                self.x += 1
-                if self.x >= len(self.lines[self.y]):
-                    self.x = 0
-                    self.y += 1
-        self.frame += 1
+    def reset(self):
+        self.kill()
+        self.done = False
+        self.lines = self.inp_lines.copy()
+        self.x = 0
+        self.y = 0
+        self.current_color = (255, 255, 255)
+        self.image = self.draw_all()
 
 
 class Speech(pygame.sprite.Sprite):
@@ -512,7 +543,7 @@ class InteractTrigger(Trigger):
         self.target = target
 
     def check(self, event):
-        if event.type == pygame.KEYUP:
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN or event.key == ord('z'):
                 if config.current_game.playable.vicinity_rect.colliderect(self.target.footprint_rect):
                     self.action()
