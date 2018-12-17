@@ -14,9 +14,9 @@ sales = LoadedImages("env","sales")
 portal_sound = LoadedSound("snd_phone")
 
 dtm_mono = LoadedFont("DTM-Mono")
+
 ob = "ob"
 no = "no"
-
 
 lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
                [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],

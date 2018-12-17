@@ -49,6 +49,7 @@ class LoadedFont:
     def __init__(self, font_name, size=36):
         self.font = pygame.font.Font(os.path.join('fonts', font_name + '.otf'), size)
 
+
 class Room:
     def __init__(self, width, height, music=None):
         self.width = width
@@ -103,21 +104,24 @@ class RoomPortal:
         self.room2 = room2
 
         self.tp_position = tp_position
-        self.fadeout = AnimOverlay(8, False)
-        self.fadein = AnimOverlay(8, True)
+        self.fadeout = AnimOverlay(16, False, on_done=self.portal)
+        self.fadein = AnimOverlay(16, True)
 
         self.sound = None
         if sound is not None:
             self.sound = sound.sound
 
     def activate(self):
-        config.current_game.playable.rect.topleft = self.tp_position
         if self.sound is not None:
             self.sound.play()
+        #if config.current_room == self.room1:
+        self.fadeout.activate()
+
+    def portal(self):
         if config.current_room == self.room1:
-            #self.fadeout.activate() сейчас функция не работает
             self.room2.activate()
-            #self.fadein.activate() и эта тоже
+            config.current_game.playable.rect.topleft = self.tp_position
+            self.fadein.activate()
 
 
 class RoomPortalStep(RoomPortal):
@@ -456,7 +460,7 @@ class Speech(pygame.sprite.Sprite):
         pygame.mixer.music.unpause()
 
 
-class DialogChoice:  #TODO
+class DialogChoice:  # TODO
     pass
 
 
@@ -500,7 +504,7 @@ class StepOnTrigger(Trigger):
 
 
 class Animation:
-    def __init__(self, frames, target):
+    def __init__(self, frames, target, on_done=None):
         self.frames = frames
         self.current_frame = 0
 
@@ -508,35 +512,44 @@ class Animation:
         self.current_value = 0
         self.delta_value = 0
 
-    def activate(self):
-        active_animations.append(self)
+        self.done = False
+        self.on_done = on_done  # on done should be function or method!
 
-    def end(self):
+    def activate(self):
+        if self not in active_animations:  # защита от дурака(меня)
+            self.current_value = config.alpha_overlay
+            self.delta_value = (self.target_value - self.current_value) // self.frames
+            active_animations.append(self)
+        self.done = False
+
+    def end(self):  # reseting all vars
         active_animations.remove(self)
         self.current_frame = 0
         self.current_value = 0
+        self.done = True
+
+        if self.on_done is not None:
+            return self.on_done()
 
     def check(self):
         if self.current_frame == self.frames:
             self.end()
-            print("end")
 
     def action_frame(self):
         pass
 
 
 class AnimOverlay(Animation):
-    def __init__(self, frames, fadein: bool):
+    def __init__(self, frames, fadein: bool, on_done=None):
         if fadein:
             target = 0
         else:
             target = 256
-        super().__init__(frames, target)
-        self.delta_value = (target-config.alpha_overlay)//frames
+        super().__init__(frames, target, on_done)
 
     def action_frame(self):
-        config.alpha_overlay = self.current_value
         self.current_value += self.delta_value
         self.current_frame += 1
+        config.alpha_overlay = self.current_value
+        #print(self.current_value)
         self.check()
-        print(self.current_value)
