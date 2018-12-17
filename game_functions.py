@@ -7,6 +7,7 @@ screensize = user32.GetSystemMetrics(78), user32.GetSystemMetrics(79)
 
 config.game_state = "overworld"
 
+
 def get_winrect():
     hwnd = pygame.display.get_wm_info()['window']
     prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
@@ -44,23 +45,29 @@ class Game:
     def player_control(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == ord('a'):
-                self.playable.control_speed(-self.playable.speed, 0)
+                self.playable.control_speed(-1, 0)
             if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                self.playable.control_speed(self.playable.speed, 0)
+                self.playable.control_speed(1, 0)
             if event.key == pygame.K_UP or event.key == ord('w'):
-                self.playable.control_speed(0, -self.playable.speed)
+                self.playable.control_speed(0, -1)
             if event.key == pygame.K_DOWN or event.key == ord('s'):
-                self.playable.control_speed(0, self.playable.speed)
+                self.playable.control_speed(0, 1)
+            if event.key == ord('x'):
+                self.playable.speed = 15
+
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == ord('a'):
-                self.playable.control_speed(self.playable.speed, 0)
+                self.playable.control_speed(1, 0)
             if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                self.playable.control_speed(-self.playable.speed, 0)
+                self.playable.control_speed(-1, 0)
             if event.key == pygame.K_UP or event.key == ord('w'):
-                self.playable.control_speed(0, self.playable.speed)
+                self.playable.control_speed(0, 1)
             if event.key == pygame.K_DOWN or event.key == ord('s'):
-                self.playable.control_speed(0, -self.playable.speed)
+                self.playable.control_speed(0, -1)
+            if event.key == ord('x'):
+                self.playable.speed = 5
+
 
     def resize(self, event):
         if event.type == VIDEORESIZE:

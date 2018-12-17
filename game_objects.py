@@ -135,7 +135,7 @@ class RoomPortalStep(RoomPortal):
 
 
 class GameObj(pygame.sprite.Sprite):
-    def __init__(self, image, animation_cycle=1, speed=20,
+    def __init__(self, image, animation_cycle=1, speed=7,
                  position=(0, 0), empty_size=(80, 80)):
         pygame.sprite.Sprite.__init__(self)
 
@@ -204,10 +204,19 @@ class Chara(GameObj):
         self.vicinity_rect.center = self.rect.center
 
     def update(self):
-        self.rect.x += self.movex
-        self.rect.y += self.movey
-
+        # undo movement if collide
+        self.rect.x += self.movex*self.speed
         self.footprint_rect.midbottom = self.rect.midbottom
+        while self.collided()[0]:
+            self.rect.x = self.rect.x - self.movex // abs(self.movex)
+            self.footprint_rect.midbottom = self.rect.midbottom
+
+        self.rect.y += self.movey*self.speed
+        self.footprint_rect.midbottom = self.rect.midbottom
+        while self.collided()[1]:
+            self.rect.y = self.rect.y - self.movey//abs(self.movey)
+            self.footprint_rect.midbottom = self.rect.midbottom
+
         if self.frame >= 4 * self.animation_cycle:
             self.frame = 0
 
@@ -225,28 +234,25 @@ class Chara(GameObj):
             self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
             self.frame += 1
 
+        self.vicinity_rect.center = self.rect.center
+
+        config.current_room.all_sprites.change_layer(self, self.rect.bottom)
+
+    def collided(self):
         collide_x = False
         collide_y = False
         for obstacle in config.current_room.obstacle_list:
-            # collide = pygame.sprite.collide_mask(self, obstacle)
             if self.footprint_rect.colliderect(obstacle.footprint_rect):
                 if self.movex != 0:
                     collide_x = True
                 if self.movey != 0:
-                    collide_y = True # collide with room border
+                    collide_y = True
+                    # collide with room border
         if self.rect.x < 0 or self.rect.right > config.current_room.width:
             collide_x = True
         if self.rect.y < 0 or self.rect.bottom > config.current_room.height:
             collide_y = True
-        # undo movement if collide
-        if collide_x:
-            self.rect.x = self.rect.x - self.movex
-        if collide_y:
-            self.rect.y = self.rect.y - self.movey
-
-        self.vicinity_rect.center = self.rect.center
-
-        config.current_room.all_sprites.change_layer(self, self.rect.bottom)
+        return collide_x, collide_y
 
 
 class Obstacle(GameObj):
@@ -386,6 +392,18 @@ class DialogSpeech(DialogBox):
                     self.lines[self.y] = self.lines[self.y][:self.x] + self.lines[self.y][self.x + 2:]
                     if command == "r":
                         self.current_color = (255, 0, 0)
+                    if command == "g":
+                        self.current_color = (0, 255, 0)
+                    if command == "b":
+                        self.current_color = (0, 0, 255)
+                    if command == "y":
+                        self.current_color = (255, 255, 0)
+                    if command == "a":
+                        self.current_color = (0, 255, 255)
+                    if command == "v":
+                        self.current_color = (255, 0, 255)
+                    if command == "o":
+                        self.current_color = (255, 127, 0)
                     if command == "w":
                         self.current_color = (255, 255, 255)
 
@@ -558,5 +576,4 @@ class AnimOverlay(Animation):
         self.current_value += self.delta_value
         self.current_frame += 1
         config.alpha_overlay = self.current_value
-        #print(self.current_value)
         self.check()
