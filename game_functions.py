@@ -2,8 +2,7 @@ from game_objects import *
 from ctypes import POINTER, WINFUNCTYPE, windll
 from ctypes.wintypes import BOOL, HWND, RECT
 
-user32 = windll.user32
-screensize = user32.GetSystemMetrics(78), user32.GetSystemMetrics(79)
+screensize = windll.user32.GetSystemMetrics(78), windll.user32.GetSystemMetrics(79)
 
 config.game_state = "overworld"
 
@@ -77,12 +76,12 @@ class Game:
             self.offset_x = (event.dict['size'][0] - self.size_x) // 2
 
     def dialog_control(self, event):
-        if config.current_dialog is not None:
+        if Dialog.current_dialog is not None:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
-                    config.current_dialog.skip()
+                    Dialog.current_dialog.skip()
                 if event.key == pygame.K_RETURN or event.key == ord('z'):
-                    config.current_dialog.next()
+                    Dialog.current_dialog.next()
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     pass
                 if event.key == pygame.K_RIGHT or event.key == ord('d'):
@@ -98,17 +97,17 @@ class Game:
 
         self.camera_x = max(0, self.camera_x)
         self.camera_y = max(0, self.camera_y)
-        self.camera_x = min((config.current_room.width - WIDTH), self.camera_x)
-        self.camera_y = min((config.current_room.height - HEIGHT), self.camera_y)
+        self.camera_x = min((Room.current_room.width - WIDTH), self.camera_x)
+        self.camera_y = min((Room.current_room.height - HEIGHT), self.camera_y)
 
     def render(self):
         #render background
-        config.current_room.camera_screen.blit(config.current_room.background, (0, 0))
+        Room.current_room.camera_screen.blit(Room.current_room.background, (0, 0))
 
         # render all sprites on whole room
-        config.current_room.all_sprites.draw(config.current_room.camera_screen)
+        Room.current_room.all_sprites.draw(Room.current_room.camera_screen)
 
-        fake_screen.blit(config.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
+        fake_screen.blit(Room.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
 
         alpha_surface.set_alpha(config.alpha_overlay)
         fake_screen.blit(alpha_surface, (0, 0))
@@ -132,17 +131,14 @@ class Game:
 
                 if config.game_state == "overworld":
                     self.player_control(event)
-                    for trigger in config.current_room.triggers_list:
+                    for trigger in Room.current_room.triggers_list:
                         trigger.check(event)
 
                 elif config.game_state == "dialog":
                     self.dialog_control(event)
 
-
-            #config.current_room.obstacle_list.update()
             if config.game_state == "overworld":
-                config.current_room.all_sprites.update()
-                #config.current_room.character_list.update()
+                Room.current_room.all_sprites.update()
 
             if config.game_state != "overworld":
                 self.playable.stop()

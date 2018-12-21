@@ -1,6 +1,7 @@
 from game_functions import *
 
 kris_walk = LoadedImages("characters", "kris_w_d", 16)
+ralsei_walk = LoadedImages("characters", "ralsei_w_d", 16, colorkey=None)
 
 dark_tree = LoadedImages("env", "tree_d_r", scale2x=False)
 boombox = LoadedImages("env", "boombox", 2)
@@ -13,6 +14,12 @@ sale = LoadedImages("env", "sale")
 sales = LoadedImages("env", "sales")
 
 portal_sound = LoadedSound("snd_phone")
+text_sound_default = LoadedSound("talk_default")
+
+Silence = MusicPlayer(None)
+FieldOfHopesAndDreams = MusicPlayer("13. Field of Hopes and Dreams")
+April2012 = MusicPlayer("27. April 2012")
+LancerMusic = MusicPlayer("9. Lancer")
 
 dtm_mono = LoadedFont("DTM-Mono")
 
@@ -52,20 +59,20 @@ lvl3_disign = [[ob, 3, 5, ob, ob, ob, ob, 3, 5, ob],
                [ob, ob, ob, ob, 21, 23, ob, ob, ob, ob],
                [9, 1, 1, 1, 25, 25, 1, 1, 1, 1]]
 
-room1 = Room(960, 960, "fofdr")
-room2 = Room(800, 640, "27. April 2012")
-room3 = Room(800, 800, "fofdr")
+room1 = Room(960, 960, FieldOfHopesAndDreams)
+room2 = Room(800, 640, April2012)
+room3 = Room(800, 800, FieldOfHopesAndDreams)
 
 room1.generate_floor(lvl1_disign, tiles_df)
 room2.generate_floor(lvl2_disign, tiles_df)
 room3.generate_floor(lvl3_disign, tiles_df)
 
 kris = Chara(kris_walk)
-ralsei = Follower(kris_walk, kris)
-ralsei.activate()
-ralsei1 = Follower(kris_walk, ralsei)
-ralsei1.activate()
-character_list.add(kris, ralsei, ralsei1)
+ralsei = Follower(ralsei_walk, kris)
+ralsei.activate()  # activate follow-mode
+#ralsei1 = Follower(kris_walk, ralsei)
+#ralsei1.activate()
+character_list.add(kris, ralsei)
 
 tree1 = Obstacle(dark_tree, (550, 100), (65, 160, 65, 25))
 boombox = Obstacle(boombox, (400, 300), (0, 0, 80, 80), 10)
@@ -76,10 +83,10 @@ sale = Obstacle(sale, (100, 80), (0, 0, 108, 166))
 sales = Obstacle(sales, (580, 80), (0, 0, 108, 166))
 
 test_box = DialogSpeech(["/rDetermination /oBravery", "/yJustice /gKindness /aPatience", "/bIntegrity /vPerseverance"],
-                        dtm_mono, None, portal_sound)
+                        dtm_mono, None, text_sound_default)
 test_box1 = DialogSpeech(["/wYou know...", "I've got all of them!", "ahahhah"],
-                         dtm_mono, lancer_dank, portal_sound)
-dialog1 = Dialog(test_box, test_box1)
+                         dtm_mono, lancer_dank, text_sound_default)
+dialog1 = Dialog(test_box, test_box1, music=LancerMusic)
 # "/wHeya. ... ", "So, i've got a question for ya.", "Do you wanna have a /rbad/w time ?"
 room1.bind(tree1, blookhouse)
 room2.bind(boombox, cantr)
