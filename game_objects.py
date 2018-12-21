@@ -1,11 +1,16 @@
 from game_init import *
 import config
 
+character_list = pygame.sprite.Group()
 dialog_layer = pygame.sprite.Group()
 active_animations = []
 
 
-def change_music(music_name=None):
+def get_distance(x1, y1, x2, y2):
+    return math.sqrt((x2-x1)**2+(y2-y1)**2)
+
+
+def change_music(music_name=None):  # TODO maybe rework as class? Also, how about class-wide variables?
     if config.current_music != music_name:
         config.previous_music = config.current_music
         pygame.mixer.music.stop()
@@ -63,7 +68,6 @@ class Room:
 
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.obstacle_list = pygame.sprite.Group()
-        self.character_list = pygame.sprite.Group()
 
         self.camera_screen = pygame.Surface((self.width, self.height))
         self.background = pygame.Surface((self.width, self.height))
@@ -89,15 +93,14 @@ class Room:
             self.all_sprites.add(obj)
             if isinstance(obj, Obstacle):
                 self.obstacle_list.add(obj)
-            if isinstance(obj, Chara):
-                self.character_list.add(obj)
+        for obj in character_list:
+            self.all_sprites.add(obj)
 
     def bind_triggers(self, *triggers):
         self.triggers_list.extend(triggers)
 
     def activate(self):
         config.current_room = self
-
         change_music(self.music)
 
 
@@ -123,7 +126,10 @@ class RoomPortal:
     def portal(self):
         if config.current_room == self.room1:
             self.room2.activate()
-            config.current_game.playable.rect.topleft = self.tp_position
+            for character in character_list:
+                character.rect.topleft = self.tp_position
+                if isinstance(character, Follower):
+                    character.reset_path()
             self.fadein.activate()
 
 
@@ -195,6 +201,7 @@ class Tile(GameObj):
 class Chara(GameObj):
     def __init__(self, walk_images):
         super().__init__(walk_images, 3)
+        self.frame_offset = 0
 
         self.boundary = (0, 70, 40, 15)
 
@@ -210,38 +217,43 @@ class Chara(GameObj):
         # undo movement if collide
         self.rect.x += self.movex*self.speed
         self.footprint_rect.midbottom = self.rect.midbottom
-        while self.collided()[0]:
+        while self.check_collisions()[0]:
             self.rect.x = self.rect.x - self.movex // abs(self.movex)
             self.footprint_rect.midbottom = self.rect.midbottom
 
         self.rect.y += self.movey*self.speed
         self.footprint_rect.midbottom = self.rect.midbottom
-        while self.collided()[1]:
+        while self.check_collisions()[1]:
             self.rect.y = self.rect.y - self.movey//abs(self.movey)
             self.footprint_rect.midbottom = self.rect.midbottom
 
-        if self.frame >= 4 * self.animation_cycle:
-            self.frame = 0
-
-        frame_offset = 0
-        if self.movey > 0:
-            frame_offset = 0
-        if self.movey < 0:
-            frame_offset = 12
-        if self.movex > 0:
-            frame_offset = 4
-        if self.movex < 0:
-            frame_offset = 8
-
-        if self.movex != 0 or self.movey != 0:
-            self.image = self.images[(self.frame // self.animation_cycle) + frame_offset]
-            self.frame += 1
+        self.change_image(self.movex, self.movey)
 
         self.vicinity_rect.center = self.rect.center
 
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
-    def collided(self):
+    def change_image(self, movex, movey):
+        if self.frame >= 4 * self.animation_cycle:
+            self.frame = 0
+
+        if movey > 0:
+            self.frame_offset = 0
+        if movey < 0:
+            self.frame_offset = 12
+        if movex > 0:
+            self.frame_offset = 4
+        if movex < 0:
+            self.frame_offset = 8
+
+        if movex == 0 and movey == 0:
+            self.frame = 0
+        self.image = self.images[(self.frame // self.animation_cycle) + self.frame_offset]
+
+        if movex != 0 or movey != 0:
+            self.frame += 1
+
+    def check_collisions(self):
         collide_x = False
         collide_y = False
         for obstacle in config.current_room.obstacle_list:
@@ -250,12 +262,47 @@ class Chara(GameObj):
                     collide_x = True
                 if self.movey != 0:
                     collide_y = True
-                    # collide with room border
+        # collide with room border
         if self.rect.x < 0 or self.rect.right > config.current_room.width:
             collide_x = True
         if self.rect.y < 0 or self.rect.bottom > config.current_room.height:
             collide_y = True
         return collide_x, collide_y
+
+
+class Follower(Chara):
+    def __init__(self, walk_images, target, path_length=15):
+        super().__init__(walk_images)
+        self.target = target
+        self.active = False
+        self.path_length = path_length
+        self.walk_path = [self.rect.center for i in range(self.path_length)]
+
+    def activate(self):
+        self.active = not self.active
+
+    def reset_path(self):
+        self.walk_path = [self.rect.center for i in range(self.path_length)]
+
+    def update(self):
+        if self.target.rect.center != self.walk_path[-1]:
+            self.walk_path.append(self.target.rect.center)
+        movex, movey = 0, 0
+        if get_distance(self.footprint_rect.center[0], self.footprint_rect.center[1],
+                        self.target.footprint_rect.center[0], self.target.footprint_rect.center[1]) > 70:
+            target_pos = self.walk_path.pop(0)
+            if len(self.walk_path) >= self.path_length:
+                self.walk_path.pop(0)
+            movex = target_pos[0] - self.rect.center[0]
+            movey = target_pos[1] - self.rect.center[1]
+
+            self.rect.x += movex
+            self.rect.y += movey
+            self.footprint_rect.midbottom = self.rect.midbottom
+            self.vicinity_rect.center = self.rect.center
+
+        self.change_image(movex, movey)
+        config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
 class Obstacle(GameObj):
@@ -284,16 +331,18 @@ class Obstacle(GameObj):
         config.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
-class Dialog:  # TODO test and music
-    def __init__(self, *speech, repeatable=True, music=None):
+class Dialog:  # TODO music
+    def __init__(self, *speech, music=None, repeatable=True):
         self.speeches = speech
         self.count = len(self.speeches)
         self.current = 0
         self.repeatable = repeatable
+        self.music = music
 
     def activate(self):
         config.current_dialog = self
         config.game_state = "dialog"
+        change_music(self.music)
         self.skip()
 
     def next(self):
@@ -314,6 +363,7 @@ class Dialog:  # TODO test and music
         self.speeches[self.current-1].reset()
         config.game_state = "overworld"
         config.current_dialog = None
+        config.current_room.activate()
 
         if self.repeatable:
             self.current = 0
@@ -458,7 +508,13 @@ class DialogSpeech(DialogBox):
         self.image = self.draw_all()
 
 
-class Speech(pygame.sprite.Sprite):
+class Choice:
+    def __init__(self, *choices):
+        self.choices = choices
+        self.current_x = 0
+        self.current_y = 0
+
+class Speech(pygame.sprite.Sprite):  # TODO DELETE THUS CLASS
     def __init__(self, text, font_name, img_name, sound_name, speed=3, autoplay_time=0):
         pygame.sprite.Sprite.__init__(self)
         self.text = text

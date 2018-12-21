@@ -1,4 +1,5 @@
 import pygame
+import math
 import os
 
 import wave

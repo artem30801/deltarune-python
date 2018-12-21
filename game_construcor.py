@@ -18,7 +18,6 @@ dtm_mono = LoadedFont("DTM-Mono")
 
 ob = "ob"
 no = "no"
-# gr =
 
 lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
                [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],
@@ -32,6 +31,7 @@ lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
                [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],
                [1, 1, 1, 1, 1, 25, 25, 1, 1, 1, 1, 1],
                [ob, ob, ob, ob, ob, ob, ob, ob, ob, ob, ob, ob]]
+
 lvl2_disign = [[no, no, no, no, no, no, no, no, no, no],
                [ob, ob, ob, ob, ob, no, no, no, no, no],
                [1, 1, 1, 2, ob, no, no, no, no, no],
@@ -40,6 +40,7 @@ lvl2_disign = [[no, no, no, no, no, no, no, no, no, no],
                [1, 1, 1, 14, ob, no, no, no, no, no],
                [ob, ob, ob, ob, ob, no, no, no, no, no],
                [no, no, no, no, no, no, no, no, no, no]]
+
 lvl3_disign = [[ob, 3, 5, ob, ob, ob, ob, 3, 5, ob],
                [3, 22, 22, 5, ob, ob, 3, 22, 22, 5],
                [21, 22, 22, 22, 19, 19, 22, 22, 22, 23],
@@ -50,15 +51,21 @@ lvl3_disign = [[ob, 3, 5, ob, ob, ob, ob, 3, 5, ob],
                [ob, ob, ob, ob, 21, 23, ob, ob, ob, ob],
                [ob, ob, ob, ob, 21, 23, ob, ob, ob, ob],
                [9, 1, 1, 1, 25, 25, 1, 1, 1, 1]]
+
 room1 = Room(960, 960, "fofdr")
 room2 = Room(800, 640, "27. April 2012")
 room3 = Room(800, 800, "fofdr")
-kris = Chara(kris_walk)
-# dialog1 = Speech("Avoid tree, bud", "DTM-Mono", "lanc_dank", "talk_default", 3)
-dialog2 = Speech("Thus is NOT your home", "DTM-Mono", "lanc_dank", "talk_default", 3)
-# dialog3 = Speech("Such a sweet music", "DTM-Mono", "lanc_dank", "talk_default", 3)
 
-# dialogsss = Dialog(dialog1, dialog2, dialog3)
+room1.generate_floor(lvl1_disign, tiles_df)
+room2.generate_floor(lvl2_disign, tiles_df)
+room3.generate_floor(lvl3_disign, tiles_df)
+
+kris = Chara(kris_walk)
+ralsei = Follower(kris_walk, kris)
+ralsei.activate()
+ralsei1 = Follower(kris_walk, ralsei)
+ralsei1.activate()
+character_list.add(kris, ralsei, ralsei1)
 
 tree1 = Obstacle(dark_tree, (550, 100), (65, 160, 65, 25))
 boombox = Obstacle(boombox, (400, 300), (0, 0, 80, 80), 10)
@@ -74,9 +81,9 @@ test_box1 = DialogSpeech(["/wYou know...", "I've got all of them!", "ahahhah"],
                          dtm_mono, lancer_dank, portal_sound)
 dialog1 = Dialog(test_box, test_box1)
 # "/wHeya. ... ", "So, i've got a question for ya.", "Do you wanna have a /rbad/w time ?"
-room1.bind(kris, tree1, blookhouse)
-room2.bind(kris, boombox, cantr)
-room3.bind(kris, heart, sale, sales)
+room1.bind(tree1, blookhouse)
+room2.bind(boombox, cantr)
+room3.bind(heart, sale, sales)
 
 portal12 = RoomPortalStep(room1, room2, (30, 120), (950, 560, 10, 80), portal_sound)
 portal122 = RoomPortalStep(room1, room2, (30, 360), (950, 800, 10, 80), portal_sound)
@@ -85,14 +92,8 @@ portal212 = RoomPortalStep(room2, room1, (880, 760), (-70, 400, 10, 80), portal_
 portal13 = RoomPortalStep(room1, room3, (720, 690), (-70, 800, 10, 80), portal_sound)
 portal31 = RoomPortalStep(room3, room1, (30, 770), (790, 720, 10, 80), portal_sound)
 
-# trig1 = InteractTrigger(dialogsss, tree1)
-trig2 = InteractTrigger(dialog1, blookhouse)
-# trig3 = InteractTrigger(dialog3, boombox)
+trig1 = InteractTrigger(dialog1, blookhouse)
 
-room1.bind_triggers(trig2)
-# room2.bind_triggers(trig3)
+room1.bind_triggers(trig1)
 
-room1.generate_floor(lvl1_disign, tiles_df)
 room1.activate()
-room2.generate_floor(lvl2_disign, tiles_df)
-room3.generate_floor(lvl3_disign, tiles_df)
