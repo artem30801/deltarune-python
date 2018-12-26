@@ -54,7 +54,7 @@ class MusicPlayer:
 
 
 class LoadedImages:
-    def __init__(self, img_folder, img_name, count=1, scale2x=True, colorkey=ALPHA, empty_size=(0, 0)):
+    def __init__(self, img_folder, img_name, count=1, scale2x=True, colorkey=ALPHA, empty_size=(40, 40)):
         self.count = count
         self.images = []
         for i in range(self.count):
@@ -69,6 +69,12 @@ class LoadedImages:
                 image = pygame.transform.scale2x(image)
             self.images.append(image)
         self.image = self.images[0]
+
+
+class LoadedTile(LoadedImages):
+    def __init__(self, img_name, count=1, isobstacle=False):
+        super().__init__("env/tiles", img_name, count)
+        self.isobstacle = isobstacle
 
 
 class LoadedSound:
@@ -96,6 +102,7 @@ class Room:
 
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.obstacle_list = pygame.sprite.Group()
+        self.background_sprites = pygame.sprite.Group()
 
         self.camera_screen = pygame.Surface((self.width, self.height))
         self.background = pygame.Surface((self.width, self.height))
@@ -106,13 +113,11 @@ class Room:
 
         for y, row in enumerate(tiles_map):
             for x, tile in enumerate(row):
-                if tile == "ob":
-                    obstacle = Obstacle(None, (x * 80, y * 80), boundary=(0, 0, 80, 80))
-                    self.bind(obstacle)
-                elif tile == "no":
-                    panel = pygame.Surface((80, 80))
-                    panel.fill(back_color)
-                    self.background.blit(panel, (x * 80, y * 80))
+                if isinstance(tile, LoadedTile):
+                    obj = Tile(tile, (x * 80, y * 80), (0, 0, 80, 80))
+                    self.background_sprites.add(obj)
+                    if obj.isobstacle:
+                        self.obstacle_list.add(obj)
                 else:
                     self.background.blit(images[tile], (x * 80, y * 80))
 
@@ -121,13 +126,14 @@ class Room:
             self.all_sprites.add(obj)
             if isinstance(obj, Obstacle):
                 self.obstacle_list.add(obj)
-        for obj in character_list:
-            self.all_sprites.add(obj)
 
     def bind_triggers(self, *triggers):
         self.triggers_list.extend(triggers)
 
     def activate(self):
+        for obj in character_list:
+            self.all_sprites.add(obj)
+
         Room.current_room = self
         self.music.play()
 
@@ -170,8 +176,7 @@ class RoomPortalStep(RoomPortal):
 
 
 class GameObj(pygame.sprite.Sprite):
-    def __init__(self, image, animation_cycle=1, speed=7,
-                 position=(0, 0), empty_size=(80, 80)):
+    def __init__(self, image, position=(0, 0), animation_cycle=3, speed=7, empty_size=(80, 80)):
         pygame.sprite.Sprite.__init__(self)
 
         self.movex = 0
@@ -198,9 +203,13 @@ class GameObj(pygame.sprite.Sprite):
 
         self._layer = self.rect.bottom
 
-    def control_speed(self, x, y):
-        self.movex += x
-        self.movey += y
+    def set_position(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
+
+    def control_speed(self, dx, dy):
+        self.movex += dx
+        self.movey += dy
 
     def stop(self):
         self.movex = 0
@@ -219,14 +228,9 @@ class GameObj(pygame.sprite.Sprite):
         Room.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
-class Tile(GameObj):
-    def __init__(self, image, animation_cycle=1, position=(0, 0)):
-        super().__init__(image, animation_cycle, position=position)
-
-
 class Chara(GameObj):
     def __init__(self, walk_images):
-        super().__init__(walk_images, 3)
+        super().__init__(walk_images, animation_cycle=3)
         self.frame_offset = 0
 
         self.boundary = (0, self.rect.height-15, self.rect.width, 15)
@@ -302,30 +306,32 @@ class Follower(Chara):
         self.target = target
         self.active = False
         self.path_length = path_length
-        self.walk_path = [self.rect.bottomleft for i in range(self.path_length)]
+        self.walk_path = []
+        self.reset_path()
 
     def activate(self):
         self.active = not self.active
 
     def reset_path(self):
-        self.walk_path = [self.rect.bottomleft for i in range(self.path_length)]
+        self.walk_path = [self.rect.midbottom for i in range(self.path_length)]
 
     def update(self):
-        if self.target.rect.bottomleft != self.walk_path[-1]:
-            self.walk_path.append(self.target.rect.bottomleft)
         movex, movey = 0, 0
-        if get_distance(self.footprint_rect.bottomleft[0], self.footprint_rect.bottomleft[1],
-                        self.target.footprint_rect.bottomleft[0], self.target.footprint_rect.bottomleft[1]) > 70:
-            target_pos = self.walk_path.pop(0)
-            if len(self.walk_path) >= self.path_length:
-                self.walk_path.pop(0)
-            movex = target_pos[0] - self.rect.bottomleft[0]
-            movey = target_pos[1] - self.rect.bottomleft[1]
+        if self.active:
+            if self.target.rect.midbottom != self.walk_path[-1]:
+                self.walk_path.append(self.target.rect.midbottom)
+            if get_distance(self.footprint_rect.midbottom[0], self.footprint_rect.midbottom[1],
+                            self.target.footprint_rect.midbottom[0], self.target.footprint_rect.midbottom[1]) > 70:
+                target_pos = self.walk_path.pop(0)
+                if len(self.walk_path) >= self.path_length:
+                    self.walk_path.pop(0)
+                movex = target_pos[0] - self.rect.midbottom[0]
+                movey = target_pos[1] - self.rect.midbottom[1]
 
-            self.rect.x += movex
-            self.rect.y += movey
-            self.footprint_rect.midbottom = self.rect.midbottom
-            self.vicinity_rect.center = self.rect.center
+                self.rect.x += movex
+                self.rect.y += movey
+        self.footprint_rect.midbottom = self.rect.midbottom
+        self.vicinity_rect.center = self.rect.center
 
         self.change_image(movex, movey)
         Room.current_room.all_sprites.change_layer(self, self.rect.bottom)
@@ -333,7 +339,7 @@ class Follower(Chara):
 
 class Obstacle(GameObj):
     def __init__(self, image, position=(0, 0), boundary=(0, 0, 80, 80), animation_cycle=1):
-        super().__init__(image, animation_cycle, position=position)
+        super().__init__(image, position, animation_cycle)
 
         self.boundary = boundary
 
@@ -357,7 +363,26 @@ class Obstacle(GameObj):
         Room.current_room.all_sprites.change_layer(self, self.rect.bottom)
 
 
-class Dialog:  # TODO music
+class Tile(Obstacle):
+    def __init__(self, tile, position=(0, 0), boundary=(0, 0, 80, 80), animation_cycle=4):
+        super().__init__(tile, position, boundary, animation_cycle)
+        self.isobstacle = tile.isobstacle
+
+    def update(self):
+        if self.movex != 0 and self.movey != 0:
+            self.rect.x += self.movex
+            self.rect.y += self.movey
+            self.footprint_rect.x = self.rect.x + self.boundary[0]
+            self.footprint_rect.y = self.rect.y + self.boundary[1]
+
+        if self.frame >= self.sprite_count * self.animation_cycle:
+            self.frame = 0
+
+        self.image = self.images[(self.frame // self.animation_cycle)]
+        self.frame += 1
+
+
+class Dialog:
     current_dialog = None
 
     def __init__(self, *speech, music=None, repeatable=True):
@@ -373,6 +398,9 @@ class Dialog:  # TODO music
         if self.music is not None:
             self.music.play()
         self.skip()
+
+    def choice(self, direction):
+        pass
 
     def next(self):
         #test if able to skip
@@ -394,7 +422,6 @@ class Dialog:  # TODO music
         Dialog.current_dialog = None
         if self.music is not None:
             MusicPlayer.play_previous()
-        #Room.current_room.activate()  # TODO delete thus
 
         if self.repeatable:
             self.current = 0
@@ -540,14 +567,25 @@ class DialogSpeech(DialogBox):
 
 
 class Choice:
-    def __init__(self, *choices):
-        self.choices = choices
+    def __init__(self, choices_map):
+        self.choice_actions = choices_map
+
+        #if mapping is None:
+        #    self.map = [i for i in range(len([self.choice_actions]))]
+        #else:
+        #    self.map = mapping #example of mapping:
         self.current_x = 0
         self.current_y = 0
+        self.current_z = 0
+
+    def change_choice(self):
+        pass
 
 
-class DialogChoice:  # TODO
-    pass
+class DialogChoice(DialogBox, Choice):  # TODO
+    def __init__(self, *choice_texts, ):
+        #super.__init__(DialogBox)
+        pass
 
 
 class Trigger:

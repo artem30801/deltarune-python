@@ -1,9 +1,4 @@
 from game_objects import *
-from ctypes import POINTER, WINFUNCTYPE, windll
-from ctypes.wintypes import BOOL, HWND, RECT
-
-screensize = windll.user32.GetSystemMetrics(78), windll.user32.GetSystemMetrics(79)
-
 config.game_state = "overworld"
 
 
@@ -105,6 +100,7 @@ class Game:
         Room.current_room.camera_screen.blit(Room.current_room.background, (0, 0))
 
         # render all sprites on whole room
+        Room.current_room.background_sprites.draw(Room.current_room.camera_screen)
         Room.current_room.all_sprites.draw(Room.current_room.camera_screen)
 
         fake_screen.blit(Room.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
@@ -137,6 +133,7 @@ class Game:
                 elif config.game_state == "dialog":
                     self.dialog_control(event)
 
+            Room.current_room.background_sprites.update()
             if config.game_state == "overworld":
                 Room.current_room.all_sprites.update()
 

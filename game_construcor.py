@@ -12,6 +12,10 @@ lancer_dank = LoadedImages("dialog", "lanc_dank")
 heart = LoadedImages("env", "heart")
 sale = LoadedImages("env", "sale")
 sales = LoadedImages("env", "sales")
+darkgrass = LoadedTile("darkgrass", 9, False)
+void_obstacle = LoadedTile(None, 1, True)
+void_empty = LoadedTile(None, 1, False)
+
 
 portal_sound = LoadedSound("snd_phone")
 text_sound_default = LoadedSound("talk_default")
@@ -23,13 +27,14 @@ LancerMusic = MusicPlayer("9. Lancer")
 
 dtm_mono = LoadedFont("DTM-Mono")
 
-ob = "ob"
-no = "no"
+ob = void_obstacle
+no = void_empty
+gr = darkgrass
 
 lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
                [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],
                [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],
-               [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],
+               [21, 22, 22, 22, 22, gr, gr, 22, 22, 22, 22, 23],
                [24, 25, 25, 25, 22, 22, 22, 22, 25, 25, 25, 26],
                [ob, ob, ob, ob, 15, 22, 22, 17, ob, ob, ob, ob],
                [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],

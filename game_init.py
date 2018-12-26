@@ -2,21 +2,21 @@ import pygame
 import math
 import os
 
-import wave
 from pygame.locals import *
+
+from ctypes import POINTER, WINFUNCTYPE, windll
+from ctypes.wintypes import BOOL, HWND, RECT
+
+#Get user screen size
+screensize = windll.user32.GetSystemMetrics(78), windll.user32.GetSystemMetrics(79)
 
 # Init pygame itself
 pygame.mixer.pre_init(44100, -16, 64, 1024)
 pygame.init()
-pygame.mixer.quit()
-pygame.mixer.init(44100, -16, 64, 1024)
-#pygame.init()
-
 # Init sound
-#file_wav = wave.open(os.path.join('SFX', "talk_default" + '.wav'))
-#frequency = file_wav.getframerate()
-#print(frequency)
-#pygame.mixer.init(frequency=frequency)
+
+pygame.mixer.init(44100, -16, 64, 1024)
+
 
 # Init basic variables
 ALPHA = (0, 0, 0)
@@ -36,7 +36,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT), HWSURFACE | DOUBLEBUF | RESIZA
 fake_screen = screen.copy()
 
 alpha_surface = fake_screen.copy()
-alpha_surface.fill((0, 0, 0))  # Fill it with whole white before the main-loop.
+alpha_surface.fill((0, 0, 0))  # Fill it with whole black
 alpha_surface.set_alpha(0)
 
 pygame.display.set_caption("SURVEY_PROGRAM")
