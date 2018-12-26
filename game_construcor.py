@@ -34,7 +34,7 @@ gr = darkgrass
 lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
                [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],
                [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],
-               [21, 22, 22, 22, 22, gr, gr, 22, 22, 22, 22, 23],
+               [21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 23],
                [24, 25, 25, 25, 22, 22, 22, 22, 25, 25, 25, 26],
                [ob, ob, ob, ob, 15, 22, 22, 17, ob, ob, ob, ob],
                [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],
@@ -46,10 +46,10 @@ lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
 
 lvl2_disign = [[no, no, no, no, no, no, no, no, no, no],
                [ob, ob, ob, ob, ob, no, no, no, no, no],
-               [1, 1, 1, 2, ob, no, no, no, no, no],
-               [ob, ob, ob, 6, ob, 18, 20, no, no, no],
-               [ob, ob, ob, 6, ob, 24, 26, no, no, no],
-               [1, 1, 1, 14, ob, no, no, no, no, no],
+               [1 , 1 , 1 , 2 , ob, no, no, no, no, no],
+               [ob, ob, ob, 6 , ob, 18, 20, no, no, no],
+               [ob, ob, ob, 6 , ob, 24, 26, no, no, no],
+               [1 , 1 , 1 , 14, ob, no, no, no, no, no],
                [ob, ob, ob, ob, ob, no, no, no, no, no],
                [no, no, no, no, no, no, no, no, no, no]]
 
@@ -73,6 +73,7 @@ room2.generate_floor(lvl2_disign, tiles_df)
 room3.generate_floor(lvl3_disign, tiles_df)
 
 kris = Chara(kris_walk)
+kris.set_position(480, 100)
 ralsei = Follower(ralsei_walk, kris)
 ralsei.activate()  # activate follow-mode
 #ralsei1 = Follower(kris_walk, ralsei)

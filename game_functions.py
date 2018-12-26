@@ -75,6 +75,7 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT or event.key == ord('x'):
                     Dialog.current_dialog.skip()
+
                 if event.key == pygame.K_RETURN or event.key == ord('z'):
                     Dialog.current_dialog.next()
                 if event.key == pygame.K_LEFT or event.key == ord('a'):

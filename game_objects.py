@@ -1,4 +1,4 @@
-from game_init import *
+from game_init import * #TODO all datatypes in funcions :int etc
 import config
 
 character_list = pygame.sprite.Group()
@@ -93,7 +93,7 @@ class LoadedFont:
 class Room:
     current_room = None
 
-    def __init__(self, width, height, music: MusicPlayer):
+    def __init__(self, width: int, height: int, music: MusicPlayer, background_image: LoadedImages=None):
         self.width = width
         self.height = height
         self.music = music
@@ -106,6 +106,8 @@ class Room:
 
         self.camera_screen = pygame.Surface((self.width, self.height))
         self.background = pygame.Surface((self.width, self.height))
+        if background_image is not None:
+            self.background.blit(background_image.image, (0, 0))
 
     def generate_floor(self, tiles_map, tiles, back_color=(0, 0, 0)):
         self.background.fill(back_color)
@@ -313,7 +315,7 @@ class Follower(Chara):
         self.active = not self.active
 
     def reset_path(self):
-        self.walk_path = [self.rect.midbottom for i in range(self.path_length)]
+        self.walk_path = [self.target.rect.midbottom for i in range(self.path_length)]
 
     def update(self):
         movex, movey = 0, 0
