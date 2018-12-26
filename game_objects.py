@@ -20,10 +20,9 @@ class MusicPlayer:
     current_music = None
     previous_music = None
     previous_time = 0
-
-    def __init__(self, music_name):
+    def __init__(self, music_name, a=0):
         self.music = music_name
-
+        self.a = a
     def play(self):
         if MusicPlayer.current_music != self:
             MusicPlayer.previous_music = MusicPlayer.current_music
@@ -32,7 +31,10 @@ class MusicPlayer:
                 MusicPlayer.previous_time = pygame.mixer.music.get_pos()
             pygame.mixer.music.stop()
             if self.music is not None:
-                pygame.mixer.music.load(os.path.join('music', self.music + '.mp3'))
+                if self.a ==0:
+                    pygame.mixer.music.load(os.path.join('music', self.music + '.mp3'))
+                else:
+                    pygame.mixer.music.load(os.path.join('music', self.music + '.wav'))
                 pygame.mixer.music.play(-1)
         MusicPlayer.current_music = self
 
@@ -51,6 +53,8 @@ class MusicPlayer:
                 pygame.mixer.music.play(-1)
                 pygame.mixer.music.set_pos(prev_time/1000)
                 print(prev_time)
+
+
 
 
 class LoadedImages:
@@ -109,7 +113,7 @@ class Room:
         if background_image is not None:
             self.background.blit(background_image.image, (0, 0))
 
-    def generate_floor(self, tiles_map, tiles, back_color=(0, 0, 0)):
+    def generate_floor(self, tiles_map, tiles=None, back_color=(0, 0, 0)):
         self.background.fill(back_color)
         images = tiles.images
 
@@ -422,9 +426,8 @@ class Dialog:
         self.speeches[self.current-1].reset()
         config.game_state = "overworld"
         Dialog.current_dialog = None
-        if self.music is not None:
-            MusicPlayer.play_previous()
-
+        if self.music is 'No':
+            pygame.mixer.music.stop()
         if self.repeatable:
             self.current = 0
 
@@ -478,20 +481,17 @@ class DialogBox(pygame.sprite.Sprite):  # Baisic class, do not call directly
 
 
 class DialogSpeech(DialogBox):
-    def __init__(self, lines, font, face_image=None, sound=None, autoplay=False, speed=3):
+    def __init__(self, lines, font, face_image=None, sound=None, speed=3):
         self.face = None
         super().__init__(font)
-
         self.frame = 0
         self.speed = speed
-        self.autoplay = autoplay
 
         self.inp_lines = lines[:]
         self.lines = lines
 
         if sound is not None:
             self.sound = sound.sound
-
         if face_image is not None:
             self.face = pygame.transform.scale(face_image.image, (160, 160))
             self.text_rect = pygame.Rect((170, 20), (620, 140))
@@ -558,8 +558,6 @@ class DialogSpeech(DialogBox):
                         self.y += 1
             else:
                 self.done = True
-                if self.autoplay:
-                    Dialog.current_dialog.skip()
             self.frame += 1
 
     def reset(self):
@@ -682,3 +680,4 @@ class AnimOverlay(Animation):
         self.current_frame += 1
         config.alpha_overlay = self.current_value
         self.check()
+

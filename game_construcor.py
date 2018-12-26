@@ -12,6 +12,7 @@ lancer_dank = LoadedImages("dialog", "lanc_dank")
 heart = LoadedImages("env", "heart")
 sale = LoadedImages("env", "sale")
 sales = LoadedImages("env", "sales")
+housesss = LoadedImages("env", "housesss")
 darkgrass = LoadedTile("darkgrass", 9, False)
 void_obstacle = LoadedTile(None, 1, True)
 void_empty = LoadedTile(None, 1, False)
@@ -24,6 +25,7 @@ Silence = MusicPlayer(None)
 FieldOfHopesAndDreams = MusicPlayer("13. Field of Hopes and Dreams")
 April2012 = MusicPlayer("27. April 2012")
 LancerMusic = MusicPlayer("9. Lancer")
+napsti = MusicPlayer("napst", 1)
 
 dtm_mono = LoadedFont("DTM-Mono")
 
@@ -42,7 +44,8 @@ lvl1_disign = [[18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 20],
                [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],
                [ob, ob, ob, ob, ob, 21, 23, ob, ob, ob, ob, ob],
                [1, 1, 1, 1, 1, 25, 25, 1, 1, 1, 1, 1],
-               [ob, ob, ob, ob, ob, ob, ob, ob, ob, ob, ob, ob]]
+               [ob, ob, ob, ob, ob, no, no, ob, ob, ob, ob, ob],
+               [ob, ob, ob, ob, ob, no, no, ob, ob, ob, ob, ob]]
 
 lvl2_disign = [[no, no, no, no, no, no, no, no, no, no],
                [ob, ob, ob, ob, ob, no, no, no, no, no],
@@ -63,14 +66,44 @@ lvl3_disign = [[ob, 3, 5, ob, ob, ob, ob, 3, 5, ob],
                [ob, ob, ob, ob, 21, 23, ob, ob, ob, ob],
                [ob, ob, ob, ob, 21, 23, ob, ob, ob, ob],
                [9, 1, 1, 1, 25, 25, 1, 1, 1, 1]]
+lvl4 = [[no, no, ob, ob, no, no, ob, ob, ob, ob],
+        [no, no, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, ob, ob, ob, ob, ob, ob]]
 
-room1 = Room(960, 960, FieldOfHopesAndDreams)
-room2 = Room(800, 640, April2012)
+room1 = Room(960, 1040, FieldOfHopesAndDreams)
+room2 = Room(800, 640, FieldOfHopesAndDreams)
 room3 = Room(800, 800, FieldOfHopesAndDreams)
+hous = Room(490,450,napsti, housesss)
+room4 = Room(800, 2400, napsti)
 
 room1.generate_floor(lvl1_disign, tiles_df)
 room2.generate_floor(lvl2_disign, tiles_df)
 room3.generate_floor(lvl3_disign, tiles_df)
+room4.generate_floor(lvl4, tiles_df)
 
 kris = Chara(kris_walk)
 kris.set_position(480, 100)
@@ -92,8 +125,9 @@ test_box = DialogSpeech(["/rDetermination /oBravery", "/yJustice /gKindness /aPa
                         dtm_mono, None, text_sound_default)
 test_box1 = DialogSpeech(["/wYou know...", "I've got all of them!", "ahahhah"],
                          dtm_mono, lancer_dank, text_sound_default)
+
 dialog1 = Dialog(test_box, test_box1, music=LancerMusic)
-# "/wHeya. ... ", "So, i've got a question for ya.", "Do you wanna have a /rbad/w time ?"
+
 room1.bind(tree1, blookhouse)
 room2.bind(boombox, cantr)
 room3.bind(heart, sale, sales)
@@ -104,9 +138,15 @@ portal21 = RoomPortalStep(room2, room1, (880, 520), (-70, 160, 10, 80), portal_s
 portal212 = RoomPortalStep(room2, room1, (880, 760), (-70, 400, 10, 80), portal_sound)
 portal13 = RoomPortalStep(room1, room3, (720, 690), (-70, 800, 10, 80), portal_sound)
 portal31 = RoomPortalStep(room3, room1, (30, 770), (790, 720, 10, 80), portal_sound)
+portal1h = RoomPortal(room1, hous, (80,330), portal_sound)
+portalh1 = RoomPortalStep(hous, room1, (205, 210), (80, 420, 160, 10), portal_sound)
+portal14 = RoomPortalStep(room1, room4, (400, 100), (480,1000,160,10), portal_sound)
+portal41 = RoomPortalStep(room4, room1, (480,900), (400, 20, 160, 10), portal_sound)
 
-trig1 = InteractTrigger(dialog1, blookhouse)
+trig1 = InteractTrigger(dialog1, heart)
+trig2 = InteractTrigger(portal1h, blookhouse)
 
-room1.bind_triggers(trig1)
+room1.bind_triggers(trig2)
+room3.bind_triggers(trig1)
 
 room1.activate()
