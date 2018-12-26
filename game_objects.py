@@ -478,11 +478,13 @@ class DialogBox(pygame.sprite.Sprite):  # Baisic class, do not call directly
 
 
 class DialogSpeech(DialogBox):
-    def __init__(self, lines, font, face_image=None, sound=None, speed=3):
+    def __init__(self, lines, font, face_image=None, sound=None, autoplay=False, speed=3):
         self.face = None
         super().__init__(font)
+
         self.frame = 0
         self.speed = speed
+        self.autoplay = autoplay
 
         self.inp_lines = lines[:]
         self.lines = lines
@@ -556,6 +558,8 @@ class DialogSpeech(DialogBox):
                         self.y += 1
             else:
                 self.done = True
+                if self.autoplay:
+                    Dialog.current_dialog.skip()
             self.frame += 1
 
     def reset(self):
