@@ -14,9 +14,17 @@ sale = LoadedImages("env", "sale")
 sales = LoadedImages("env", "sales")
 housesss = LoadedImages("env", "housesss")
 darkgrass = LoadedTile("darkgrass", 9, False)
+dd = LoadedTile("dark", 1, True)
+m1 = LoadedTile("m",1,True)
+m2 = LoadedTile("m2",1,True)
+m3 = LoadedTile("m3",1, True)
+m4 = LoadedTile("m4",1,True)
+m5 = LoadedTile("m5",1,True)
 void_obstacle = LoadedTile(None, 1, True)
 void_empty = LoadedTile(None, 1, False)
-
+rarara = LoadedImages("dialog", "rarara")
+sansa = LoadedImages("dialog","sansa")
+gangsta = LoadedImages("env", "gangsta")
 
 portal_sound = LoadedSound("snd_phone")
 text_sound_default = LoadedSound("talk_default")
@@ -66,33 +74,33 @@ lvl3_disign = [[ob, 3, 5, ob, ob, ob, ob, 3, 5, ob],
                [ob, ob, ob, ob, 21, 23, ob, ob, ob, ob],
                [ob, ob, ob, ob, 21, 23, ob, ob, ob, ob],
                [9, 1, 1, 1, 25, 25, 1, 1, 1, 1]]
-lvl4 = [[no, no, ob, ob, no, no, ob, ob, ob, ob],
-        [no, no, ob, ob, no, no, ob, ob, ob, ob],
+lvl4 = [[ob,ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [m5, ob, ob, ob, no, no, ob, ob, m2, ob],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, dd, ob, ob, ob],
+        [ob, ob, m2, ob, no, no, ob, ob, m2, ob],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [dd, ob, ob, ob, no, no, ob, ob, m3, ob],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, m4, ob, ob],
+        [ob, ob, ob, ob, no, no, dd, ob, ob, ob],
+        [ob, m3, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, ob, m2, ob, ob],
+        [dd, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, m3, ob, no, no, ob, ob, ob, m4],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, ob, ob, ob, no, no, dd, ob, ob, ob],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, m3, ob, ob, no, no, ob, m4, ob, ob],
+        [dd, ob, ob, ob, no, no, ob, ob, ob, ob],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [m2, ob, ob, ob, no, no, ob, ob, ob, m3],
+        [ob, ob, ob, ob, no, no, dd, ob, ob, ob],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
+        [ob, m5, ob, ob, no, no, m3, ob, ob, ob],
+        [dd, ob, ob, ob, no, no, ob, ob, ob, ob],
         [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, no, no, ob, ob, ob, ob],
-        [ob, ob, ob, ob, ob, ob, ob, ob, ob, ob]]
+        [ob, ob, ob, ob, ob, ob, ob, m4, ob, ob]]
 
 room1 = Room(960, 1040, FieldOfHopesAndDreams)
 room2 = Room(800, 640, FieldOfHopesAndDreams)
@@ -120,17 +128,26 @@ cantr = Obstacle(candy_tree, (436, 180), (0, 0, 80, 80))
 heart = Obstacle(heart, (10, 740), (0, 0, 30, 60))
 sale = Obstacle(sale, (100, 80), (0, 0, 108, 166))
 sales = Obstacle(sales, (580, 80), (0, 0, 108, 166))
+gangsta = Obstacle(gangsta, (360,120), (0,0, 48, 80))
 
 test_box = DialogSpeech(["/rDetermination /oBravery", "/yJustice /gKindness /aPatience", "/bIntegrity /vPerseverance"],
                         dtm_mono, None, text_sound_default)
 test_box1 = DialogSpeech(["/wYou know...", "I've got all of them!", "ahahhah"],
                          dtm_mono, lancer_dank, text_sound_default)
+b1 = DialogSpeech(["/wDo you remember this?"], dtm_mono,rarara, text_sound_default)
+b2 = DialogSpeech(["This is your /rsoul/w,", "the very culmination" ,"of your being."],dtm_mono,rarara, text_sound_default)
+b3 = DialogSpeech(["/rAND YOU LEFT IT"], dtm_mono, sansa, text_sound_default, 9)
+b4 = DialogSpeech(["oh hello", "i'm sorry but i'm busy now", 'come later'],dtm_mono, None, text_sound_default, 1)
+b5 = DialogSpeech(["yes come later", "oh don't force yourself", "oh no oh no"],dtm_mono, None, text_sound_default, 1)
 
 dialog1 = Dialog(test_box, test_box1, music=LancerMusic)
+dialog2 = Dialog(b1, b2,b3, music = Silence)
+dialog3 = Dialog(b4, b5, music = napsti)
 
 room1.bind(tree1, blookhouse)
 room2.bind(boombox, cantr)
 room3.bind(heart, sale, sales)
+hous.bind(gangsta)
 
 portal12 = RoomPortalStep(room1, room2, (30, 120), (950, 560, 10, 80), portal_sound)
 portal122 = RoomPortalStep(room1, room2, (30, 360), (950, 800, 10, 80), portal_sound)
@@ -143,10 +160,17 @@ portalh1 = RoomPortalStep(hous, room1, (205, 210), (80, 420, 160, 10), portal_so
 portal14 = RoomPortalStep(room1, room4, (400, 100), (480,1000,160,10), portal_sound)
 portal41 = RoomPortalStep(room4, room1, (480,900), (400, 20, 160, 10), portal_sound)
 
-trig1 = InteractTrigger(dialog1, heart)
+trig1 = InteractTrigger(dialog1, tree1)
 trig2 = InteractTrigger(portal1h, blookhouse)
+trig3 = InteractTrigger(dialog2, heart)
+trig4 = InteractTrigger(dialog3, gangsta)
+
+
+
 
 room1.bind_triggers(trig2)
-room3.bind_triggers(trig1)
+room1.bind_triggers(trig1)
+room3.bind_triggers(trig3)
+hous.bind_triggers(trig4)
 
 room1.activate()

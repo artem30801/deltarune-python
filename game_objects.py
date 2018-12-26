@@ -76,10 +76,9 @@ class LoadedImages:
 
 
 class LoadedTile(LoadedImages):
-    def __init__(self, img_name, count=1, isobstacle=False):
-        super().__init__("env/tiles", img_name, count)
+    def __init__(self, img_name, count=1, isobstacle=False, scale2x=False):
+        super().__init__("env/tiles", img_name, count,scale2x)
         self.isobstacle = isobstacle
-
 
 class LoadedSound:
     def __init__(self, sound_name):
@@ -426,8 +425,8 @@ class Dialog:
         self.speeches[self.current-1].reset()
         config.game_state = "overworld"
         Dialog.current_dialog = None
-        if self.music is 'No':
-            pygame.mixer.music.stop()
+        if self.music is not None:
+            MusicPlayer.play_previous()
         if self.repeatable:
             self.current = 0
 
