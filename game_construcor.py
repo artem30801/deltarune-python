@@ -137,7 +137,7 @@ test_box1 = DialogSpeech(["/wYou know...", "I've got all of them!", "ahahhah"],
 b1 = DialogSpeech(["/wDo you remember this?"], dtm_mono,rarara, text_sound_default)
 b2 = DialogSpeech(["This is your /rsoul/w,", "the very culmination" ,"of your being."],dtm_mono,rarara, text_sound_default)
 b3 = DialogSpeech(["/rAND YOU LEFT IT"], dtm_mono, sansa, text_sound_default, 9)
-b4 = DialogSpeech(["oh hello", "i'm sorry but i'm busy now", 'come later'],dtm_mono, None, text_sound_default, 1)
+b4 = DialogSpeech(["/woh hello", "i'm sorry but i'm busy now", 'come later'],dtm_mono, None, text_sound_default, 1)
 b5 = DialogSpeech(["yes come later", "oh don't force yourself", "oh no oh no"],dtm_mono, None, text_sound_default, 1)
 
 dialog1 = Dialog(test_box, test_box1, music=LancerMusic)
