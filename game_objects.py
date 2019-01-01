@@ -10,10 +10,19 @@ def get_distance(x1, y1, x2, y2):
     return math.sqrt((x2-x1)**2+(y2-y1)**2)
 
 
-def get_empty_image(empty_size=(80, 80)):
+def get_empty_image(empty_size=(80, 80), colorkey=pygame.color.Color("black")):
     image = pygame.Surface(empty_size)
+    image.fill(colorkey)
     image.set_colorkey(ALPHA)
     return image
+
+
+def convert_to_colorkey_alpha(surf, colorkey=pygame.color.Color("magenta")):
+    newsurf = pygame.Surface(surf.get_size())
+    newsurf.fill(colorkey)
+    newsurf.blit(surf, (0, 0))
+    newsurf.set_colorkey(colorkey)
+    return newsurf
 
 
 class MusicPlayer:
@@ -55,15 +64,14 @@ class MusicPlayer:
 
 
 class LoadedImages:
-    def __init__(self, img_folder, img_name, count=1, scale2x=True, colorkey=ALPHA, empty_size=(40, 40)):
+    def __init__(self, img_folder, img_name, count=1, scale2x=True, empty_size=(40, 40)):
         self.count = count
         self.images = []
         for i in range(self.count):
             if img_name is not None:
                 image = pygame.image.load(
                     os.path.join('images', img_folder, img_name + str(i+1) + '.png')).convert_alpha()
-                if colorkey is not None:
-                    image.set_colorkey(colorkey)
+                image = convert_to_colorkey_alpha(image)
             else:
                 image = get_empty_image(empty_size)
             if scale2x:
@@ -73,7 +81,7 @@ class LoadedImages:
 
 
 class LoadedTile(LoadedImages):
-    def __init__(self, img_name, count=1, isobstacle=False, scale2x=False):
+    def __init__(self, img_name, count=1, isobstacle=False, scale2x=True):
         super().__init__("env/tiles", img_name, count, scale2x)
         self.isobstacle = isobstacle
 
@@ -147,25 +155,33 @@ class RoomPortal:
         self.room2 = room2
 
         self.tp_position = tp_position
-        self.fadeout = AnimOverlay(16, False, on_done=self.portal)
-        self.fadein = AnimOverlay(16, True)
+        self.fadeout = AnimateAlpha(15, 255, alpha_surface, on_done=self.portal)
+        self.fadein = AnimateAlpha(15, 0, alpha_surface, on_done=self.done)
 
         self.sound = None
         if sound is not None:
             self.sound = sound.sound
 
+        self.active = False
+
     def activate(self):
-        if self.sound is not None:
-            self.sound.play()
-        self.fadeout.activate()
+        if not self.active:
+            if self.sound is not None:
+                self.sound.play()
+            self.fadeout.activate()
+        self.active = True
 
     def portal(self):
-        self.room2.activate()
+        if self.room1 is not self.room2:
+            self.room2.activate()
         for character in character_list:
             character.rect.topleft = self.tp_position
             if isinstance(character, Follower):
                 character.reset_path()
         self.fadein.activate()
+
+    def done(self):
+        self.active = False
 
 
 class RoomPortalStep(RoomPortal):
@@ -200,10 +216,7 @@ class GameObj(pygame.sprite.Sprite):
             self.sprite_count = 1
 
         self.image = self.images[0]
-        self.rect = self.image.get_rect()
-        self.rect.x = position[0]
-        self.rect.y = position[1]
-
+        self.rect = self.image.get_rect(topleft=position)
         self._layer = self.rect.bottom
 
     def set_position(self, x, y):
@@ -633,52 +646,77 @@ class StepOnTrigger(Trigger):
 
 
 class Animation:
-    def __init__(self, frames, target, on_done=None):
+    def __init__(self, frames, target_value, target_obj, on_done=None, tweening=tween.linear):
         self.frames = frames
         self.current_frame = 0
 
-        self.target_value = target
+        self.target_obj = target_obj
+        self.target_value = target_value
+        self.start_value = 0
         self.current_value = 0
         self.delta_value = 0
+
+        self.tweening = tweening
 
         self.done = False
         self.on_done = on_done  # on done should be function or method!
 
     def activate(self):
+        print("anim to", self.target_value)
         if self not in active_animations:  # защита от дурака(меня)
-            self.current_value = config.alpha_overlay
-            self.delta_value = (self.target_value - self.current_value) // self.frames
+            self.start_value = self.get_current()
+            self.delta_value = self.target_value - self.start_value
             active_animations.append(self)
         self.done = False
 
     def end(self):  # reseting all vars
         active_animations.remove(self)
+        self.set_targets_value(self.target_value)
         self.current_frame = 0
-        self.current_value = 0
         self.done = True
+        print("end")
 
         if self.on_done is not None:
             return self.on_done()
 
-    def check(self):
-        if self.current_frame == self.frames:
+    def action_frame(self):
+        self.current_value = self.start_value + self.delta_value * self.tweening(self.current_frame/self.frames)
+        self.current_frame += 1
+        self.set_targets_value(self.current_value)
+        if self.current_frame >= self.frames:
             self.end()
 
-    def action_frame(self):
+    def get_current(self):
+        return 0
+
+    def set_targets_value(self, value):
         pass
 
 
-class AnimOverlay(Animation):
-    def __init__(self, frames, fadein: bool, on_done=None):
-        if fadein:
-            target = 0
+class AnimateAlpha(Animation):
+    def get_current(self):
+        obj = self.target_obj
+        if isinstance(obj, list):
+            obj = obj[0]
+        val = obj.get_alpha()
+        if val is not None:
+            return val
         else:
-            target = 256
-        super().__init__(frames, target, on_done)
+            return 255
 
-    def action_frame(self):
-        self.current_value += self.delta_value
-        self.current_frame += 1
-        config.alpha_overlay = self.current_value
-        self.check()
+    def set_targets_value(self, value):
+        if isinstance(self.target_obj, list):
+            for image in self.target_obj:
+                image.set_alpha(abs(value))
+        else:
+            self.target_obj.set_alpha(abs(value))
 
+
+class AnimatePosition(Animation):
+    def get_current(self):
+        x, y = self.target_obj.rect.x, self.target_obj.rect.y
+        return numpy.array((x, y), dtype=float)
+
+    def set_targets_value(self, value):
+        x, y = value
+        self.target_obj.set_position(int(x), int(y))

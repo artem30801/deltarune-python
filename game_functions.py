@@ -2,25 +2,39 @@ from game_objects import *
 config.game_state = "overworld"
 
 
-def get_winrect():
-    hwnd = pygame.display.get_wm_info()['window']
-    prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
-    paramflags = (1, "hwnd"), (2, "lprect")
-    getrect = prototype(("GetWindowRect", windll.user32), paramflags)
-    rect = getrect(hwnd)
+class Window:
+    def __init__(self):
+        self.hwnd = None
+        self.rect = None#pygame.Rect(0, 0, WIDTH, HEIGHT)
 
-    x = rect.left
-    y = rect.top
-    w = rect.right - rect.left
-    h = rect.bottom - rect.top
+    def update(self):
+        self.hwnd = pygame.display.get_wm_info()['window']
+        self.rect = pygame.Rect(self.get_winrect())
 
-    return x, y, w, h
+    def get_winrect(self):
+        prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
+        paramflags = (1, "hwnd"), (2, "lprect")
+        getrect = prototype(("GetWindowRect", windll.user32), paramflags)
+        rect = getrect(self.hwnd)
+
+        x = rect.left
+        y = rect.top
+        w = rect.right - rect.left
+        h = rect.bottom - rect.top
+
+        return x, y, w, h
+
+    def set_position(self, x, y):
+        w, h = self.rect.size
+        windll.user32.MoveWindow(self.hwnd, x, y, w, h, False)
+
+    def move(self, dx, dy, dw=0, dh=0):
+        (x, y), (w, h) = self.rect.topleft, self.rect.size
+        print(x, y, w, h)
+        windll.user32.MoveWindow(self.hwnd, x+dx, y+dy, w+dw, h+dh, False)
 
 
-def move_winrect(dx, dy, dw=0, dh=0):
-    hwnd = pygame.display.get_wm_info()['window']
-    x, y, w, h = get_winrect()
-    windll.user32.MoveWindow(hwnd, x+dx, y+dy, w+dw, h+dh, False)
+window = Window()
 
 
 class Game:
@@ -103,13 +117,14 @@ class Game:
         # render all sprites on whole room
         Room.current_room.background_sprites.draw(Room.current_room.camera_screen)
         Room.current_room.all_sprites.draw(Room.current_room.camera_screen)
+        #Room.current_room.camera_screen.set_alpha(3)
 
         fake_screen.blit(Room.current_room.camera_screen, (0, 0), (self.camera_x, self.camera_y, WIDTH, HEIGHT))
 
-        alpha_surface.set_alpha(config.alpha_overlay)
         fake_screen.blit(alpha_surface, (0, 0))
 
         dialog_layer.draw(fake_screen)
+        #fake_screen.set_alpha(20) пиздецовый сюр. мб пригодится
 
         # render fake screen
         screen.blit(pygame.transform.scale(fake_screen, (self.size_x, self.size_y)), (self.offset_x, 0))
@@ -134,6 +149,11 @@ class Game:
                 elif config.game_state == "dialog":
                     self.dialog_control(event)
 
+            window.update()
+
+            for animation in active_animations:
+                animation.action_frame()
+
             Room.current_room.background_sprites.update()
             if config.game_state == "overworld":
                 Room.current_room.all_sprites.update()
@@ -144,11 +164,7 @@ class Game:
             if config.game_state == "dialog":
                 dialog_layer.update()
 
-            for animation in active_animations:
-                animation.action_frame()
-
             self.update_camera()
             self.render()
-            move_winrect(0, 0)
 
             time.tick(FPS)

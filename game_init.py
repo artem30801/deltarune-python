@@ -1,11 +1,14 @@
-import pygame
 import math
+import numpy
 import os
-
-from pygame.locals import *
 
 from ctypes import POINTER, WINFUNCTYPE, windll
 from ctypes.wintypes import BOOL, HWND, RECT
+
+import pygame
+from pygame.locals import *
+import pytweening as tween
+
 
 #Get user screen size
 screensize = windll.user32.GetSystemMetrics(78), windll.user32.GetSystemMetrics(79)
@@ -34,6 +37,7 @@ pygame.display.set_icon(icon)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), HWSURFACE | DOUBLEBUF | RESIZABLE)
 fake_screen = screen.copy()
+fake_screen.set_alpha(255)
 
 alpha_surface = fake_screen.copy()
 alpha_surface.fill((0, 0, 0))  # Fill it with whole black

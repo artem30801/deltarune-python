@@ -2,7 +2,7 @@ from game_functions import *
 
 # walk and actions
 kris_walk = LoadedImages("characters", "kris_w_d", 16)
-ralsei_walk = LoadedImages("characters", "ralsei_w_d", 16, colorkey=None)
+ralsei_walk = LoadedImages("characters", "ralsei_w_d", 16)
 
 # dialog_faces
 rarara = LoadedImages("dialog", "ralsei_face1-")
@@ -23,7 +23,7 @@ housesss = LoadedImages("env", "napstablook_house_inner2", scale2x=False)
 # tiles ad tilesets
 tiles_df = LoadedImages("env\\tiles\\dark_forest", "tile", 27)
 darkgrass = LoadedTile("darkgrass", 9, False)
-dd = LoadedTile("bg_darkstone_1-", 1, True)
+dd = LoadedTile("bg_darkstone_1-", 1, True, scale2x=False)
 #m1 = LoadedTile("waterfall_lshoom1-", 1, True)
 m2 = LoadedTile("waterfall_lshoom1-", 1, True)
 m3 = LoadedTile("waterfall_lshoom2-", 1, True)
@@ -69,13 +69,13 @@ lvl2_disign = [[no, no, no, no, no, no, no, no, no, no],
                [ob, ob, ob, 6 , ob, 18, 20, no, no, no],
                [ob, ob, ob, 6 , ob, 24, 26, no, no, no],
                [1 , 1 , 1 , 14, ob, no, no, no, no, no],
-               [ob, ob, ob, ob, ob, no, no, no, no, no],
+               [ob, ob, gr, ob, ob, no, no, no, no, no],
                [no, no, no, no, no, no, no, no, no, no]]
 
 lvl3_disign = [[ob, 3, 5, ob, ob, ob, ob, 3, 5, ob],
                [3, 22, 22, 5, ob, ob, 3, 22, 22, 5],
                [21, 22, 22, 22, 19, 19, 22, 22, 22, 23],
-               [15, 22, 22, 22, 22, 22, 22, 22, 22, 17],
+               [15, 22, 22, 22, 22, 2, 22, 22, 22, 17],
                [ob, 15, 22, 22, 22, 22, 22, 22, 17, ob],
                [ob, ob, 15, 22, 22, 22, 22, 17, ob, ob],
                [ob, ob, ob, 15, 22, 22, 17, ob, ob, ob],
@@ -189,7 +189,7 @@ portal1h = RoomPortal(room1, blook_house_inside, (160, 500), portal_sound)
 portalh1 = RoomPortalStep(blook_house_inside, room1, (205, 210), (160, 590, 160, 10), portal_sound)
 portal14 = RoomPortalStep(room1, room4, (400, 100), (480, 1000, 160, 10), portal_sound)
 portal41 = RoomPortalStep(room4, room1, (480, 900), (0, 0, 600, 80), portal_sound)
-portal43 = RoomPortalStep(room4, room4, (400, 100), (0, 2320, 600, 80), None)
+portal44 = RoomPortalStep(room4, room4, (400, 200), (0, 2320, 600, 80), None)
 
 trig1 = InteractTrigger(dialog1, tree1)
 trig2 = InteractTrigger(portal1h, blookhouse)
@@ -201,3 +201,11 @@ room3.bind_triggers(trig3)
 blook_house_inside.bind_triggers(trig4)
 
 room1.activate()
+
+#just testing
+anim_rls = AnimateAlpha(60, 3, ralsei.images, tweening=tween.easeOutBounce)
+#anim_rls.activate()
+
+window.update()
+anim_pos = AnimatePosition(60, (0, 0), window, on_done=anim_rls.activate, tweening=tween.easeInExpo)
+anim_pos.activate()
