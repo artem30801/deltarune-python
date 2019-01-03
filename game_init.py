@@ -7,6 +7,13 @@ from ctypes.wintypes import BOOL, HWND, RECT
 
 import pygame
 from pygame.locals import *
+
+import pytmx
+from pytmx import TiledImageLayer
+from pytmx import TiledObjectGroup
+from pytmx import TiledTileLayer
+from pytmx.util_pygame import load_pygame
+
 import pytweening as tween
 
 

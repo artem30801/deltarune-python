@@ -124,11 +124,11 @@ napstablook_house_disign = [[ob, ob, ob, ob, ob, ob, ob, ob, ob, ob],
                             [ob, ob, no, no, ob, ob, ob, ob, ob, ob],
                             [ob, ob, no, no, ob, ob, ob, ob, ob, ob]]
 
-room1 = Room(960, 1040, FieldOfHopesAndDreams)
-room2 = Room(800, 640, FieldOfHopesAndDreams)
-room3 = Room(800, 800, FieldOfHopesAndDreams)
-blook_house_inside = Room(800, 600, napstablook_theme, housesss)
-room4 = Room(800, 2400, sad_theme)
+room1 = Room("dark_intro3", FieldOfHopesAndDreams, 960, 1040)
+room2 = Room("secret1", FieldOfHopesAndDreams, 800, 640)
+room3 = Room("tradein1", FieldOfHopesAndDreams, 800, 800)
+blook_house_inside = Room("blook_indoor", napstablook_theme, 800, 600, housesss)
+room4 = Room("dark_path", sad_theme, 800, 2400)
 
 room1.generate_floor(lvl1_disign, tiles_df)
 room2.generate_floor(lvl2_disign, tiles_df)
@@ -138,7 +138,7 @@ room4.generate_floor(lvl4_disign, tiles_df)
 
 
 kris = Chara(kris_walk)
-kris.set_position(480, 100)
+kris.set_position(400, 300)
 ralsei = Follower(ralsei_walk, kris)
 ralsei.activate()  # activate follow-mode
 #ralsei1 = Follower(kris_walk, ralsei)
@@ -200,12 +200,22 @@ room1.bind_triggers(trig1, trig2)
 room3.bind_triggers(trig3)
 blook_house_inside.bind_triggers(trig4)
 
-room1.activate()
+#just testing
+dark_intro1 = Room("dark_intro1", music=Silence)
+dark_intro2 = Room("dark_intro2", music=Silence)
+
+
+dark_intro1.load_tmx("dark_intro1")
+dark_intro2.load_tmx("dark_intro2")
+
+dark_intro1.activate()
+#room1.activate()
+
 
 #just testing
-anim_rls = AnimateAlpha(60, 3, ralsei.images, tweening=tween.easeOutBounce)
+#anim_rls = AnimateAlpha(60, 3, ralsei.images, tweening=tween.easeOutBounce)
 #anim_rls.activate()
 
-window.update()
-anim_pos = AnimatePosition(60, (0, 0), window, on_done=anim_rls.activate, tweening=tween.easeInExpo)
-anim_pos.activate()
+#window.update()
+#anim_pos = AnimatePosition(60, (0, 0), window, on_done=anim_rls.activate, tweening=tween.easeInExpo)
+#anim_pos.activate()

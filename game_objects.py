@@ -45,7 +45,6 @@ class MusicPlayer:
                 pygame.mixer.music.load(os.path.join('music', self.music + self.ext))
                 pygame.mixer.music.play(-1)
         MusicPlayer.current_music = self
-        #print(MusicPlayer.previous_music.music)
 
     @staticmethod
     def play_previous():
@@ -101,11 +100,15 @@ class LoadedFont:
 
 class Room:
     current_room = None
+    rooms_dict = {}
 
-    def __init__(self, width: int, height: int, music: MusicPlayer, background_image: LoadedImages=None):
+    def __init__(self, name: str, music: MusicPlayer = None, width: int = WIDTH, height: int = HEIGHT, background_image: LoadedImages = None):  # Fix order
         self.width = width
         self.height = height
         self.music = music
+
+        self.name = name
+        Room.rooms_dict[self.name] = self
 
         self.triggers_list = []
 
@@ -131,6 +134,28 @@ class Room:
                         self.obstacle_list.add(obj)
                 else:
                     self.background.blit(images[tile], (x * 80, y * 80))
+
+    def load_tmx(self, filename):
+        tm = load_pygame("tmx/"+filename+".tmx")
+        self.width, self.height = tm.width * tm.tilewidth, tm.height * tm.tileheight
+        if tm.background_color:
+            self.background.fill(pygame.Color(tm.background_color))
+        tw = tm.tilewidth
+        th = tm.tileheight
+        for layer in tm.visible_layers:
+            if isinstance(layer, TiledTileLayer):
+                for x, y, image in layer.tiles():
+                    self.background.blit(image, (x * tw, y * th))
+            if isinstance(layer, TiledObjectGroup):
+                for obj in layer:
+                    if obj.type == 'obstacle':
+                        obstacle = Obstacle(None, position=(obj.x, obj.y), boundary=(0, 0, obj.width, obj.height))
+                        obstacle.add(self.all_sprites, self.obstacle_list)
+                    elif obj.type == 'portal':
+                        room2 = Room.rooms_dict[obj.properties['dest_room']]
+                        portal = RoomPortalStep(self, room2,
+                                                tp_position=(obj.properties['dest_x'], obj.properties['dest_y']),
+                                                position=(obj.x, obj.y, obj.width, obj.height))
 
     def bind(self, *game_objects):
         for obj in game_objects:
