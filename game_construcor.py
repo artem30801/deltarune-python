@@ -203,17 +203,20 @@ blook_house_inside.bind_triggers(trig4)
 #just testing
 dark_intro1 = Room("dark_intro1", music=Silence)
 dark_intro2 = Room("dark_intro2", music=Silence)
+dark_intro3 = Room("dark_intro3", music=Silence)
 
 
 dark_intro1.load_tmx("dark_intro1")
 dark_intro2.load_tmx("dark_intro2")
+dark_intro3.load_tmx("dark_intro3")
+
 
 dark_intro1.activate()
 #room1.activate()
 
 
 #just testing
-#anim_rls = AnimateAlpha(60, 3, ralsei.images, tweening=tween.easeOutBounce)
+#anim_rls = AnimateAlpha(60, 3, ralsei.images, tweening=tween.easeInOutSine)
 #anim_rls.activate()
 
 #window.update()

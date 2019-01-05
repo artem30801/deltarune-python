@@ -138,6 +138,9 @@ class Room:
     def load_tmx(self, filename):
         tm = load_pygame("tmx/"+filename+".tmx")
         self.width, self.height = tm.width * tm.tilewidth, tm.height * tm.tileheight
+        self.camera_screen = pygame.Surface((self.width, self.height))  # fix thus
+        self.background = pygame.Surface((self.width, self.height))
+
         if tm.background_color:
             self.background.fill(pygame.Color(tm.background_color))
         tw = tm.tilewidth
@@ -699,7 +702,6 @@ class Animation:
         self.set_targets_value(self.target_value)
         self.current_frame = 0
         self.done = True
-        print("end")
 
         if self.on_done is not None:
             return self.on_done()
@@ -745,3 +747,8 @@ class AnimatePosition(Animation):
     def set_targets_value(self, value):
         x, y = value
         self.target_obj.set_position(int(x), int(y))
+
+
+class Animator:
+    def __init__(self):
+        pass

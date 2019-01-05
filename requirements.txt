@@ -1,0 +1,6 @@
+numpy==1.15.4
+pygame==1.9.4
+PyTMX==3.21.6
+PyTweening==1.0.3
+pywin32-ctypes==0.2.0
+six==1.12.0
